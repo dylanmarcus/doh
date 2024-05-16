@@ -55,6 +55,7 @@ function Ingredients() {
             <div className={classes.inputWrapper}>
               <TextInput
                 classNames={{ input: classes.input }}
+                styles={{ input: { textAlign: 'right' } }}
                 placeholder={ingredient.isBaseIngredient ? 'Total baseIngredient weight' : 'Baker\'s percentage'}
                 rightSection={<span>{ingredient.isBaseIngredient ? 'g' : '%'}</span>}
                 value={ingredient.isBaseIngredient ? baseIngredientWeight : ingredientPercentages[index]}
@@ -72,6 +73,7 @@ function Ingredients() {
               {!ingredient.isBaseIngredient ? (
                 <TextInput
                 classNames={{ input: classes.input }}
+                styles={{ input: { textAlign: 'right' } }}
                 readOnly
                 value={
                   ingredient.isBaseIngredient
