@@ -69,7 +69,8 @@ function Ingredients() {
                   }
                 }}
               />
-              <TextInput
+              {!ingredient.isBaseIngredient ? (
+                <TextInput
                 classNames={{ input: classes.input }}
                 readOnly
                 value={
@@ -79,6 +80,7 @@ function Ingredients() {
                 }
                 rightSection={<span>g</span>}
               />
+              ) : (<></>)}
             </div>
           </Grid.Col>
         </Grid>
