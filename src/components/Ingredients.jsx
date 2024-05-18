@@ -56,14 +56,14 @@ function Ingredients() {
     const value = parseInt(event.target.value);
     setNumberOfBalls(value);
     setBaseIngredientWeight(value * ballWeight);
-    updateIngredientPercentages(value * ballWeight);
+    // updateIngredientPercentages(value * ballWeight);
   };
 
   const handleBallWeightChange = (event) => {
     const value = parseInt(event.target.value);
     setBallWeight(value);
     setBaseIngredientWeight(numberOfBalls * value);
-    updateIngredientPercentages(numberOfBalls * value);
+    // updateIngredientPercentages(numberOfBalls * value);
   };
 
   const updateIngredientPercentages = (flourWeight) => {
@@ -139,7 +139,7 @@ function Ingredients() {
                   classNames={{ input: classes.input }}
                   styles={{ input: { textAlign: 'right' } }}
                   readOnly
-                  value={ingredientPercentages[index].toFixed(2)}
+                  value={percentageToGrams(ingredientPercentages[index], baseIngredientWeight).toFixed(2)}
                   rightSection={<span>g</span>}
                 />
               ) : null}
