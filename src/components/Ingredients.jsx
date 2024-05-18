@@ -1,5 +1,5 @@
 // src/components/Ingredients.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, Grid, Box, Title } from '@mantine/core';
 import { createStyles } from '@mantine/styles';
 import { percentageToGrams } from '../utils/calculate';
@@ -39,7 +39,7 @@ function Ingredients() {
   const { classes } = useStyles();
   const [numberOfBalls, setNumberOfBalls] = useState(1);
   const [ballWeight, setBallWeight] = useState(500);
-  const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
+  const [baseIngredientWeight, setBaseIngredientWeight] = useState(numberOfBalls * ballWeight);
   const [ingredientPercentages, setIngredientPercentages] = useState([
     numberOfBalls * ballWeight, // Default value for flour
     60,                         // Default value for water
@@ -48,29 +48,28 @@ function Ingredients() {
     10,                         // Default value for fat
   ]);
 
+  useEffect(() => {
+    setBaseIngredientWeight(numberOfBalls * ballWeight);
+  }, [numberOfBalls, ballWeight]);
+
   const handleInputFocus = (event) => {
     event.target.select();
   };
 
   const handleNumberOfBallsChange = (event) => {
     const value = parseInt(event.target.value);
-    setNumberOfBalls(value);
-    setBaseIngredientWeight(value * ballWeight);
-    // updateIngredientPercentages(value * ballWeight);
+    setNumberOfBalls(value || 0); // Ensure value is a valid number
   };
 
   const handleBallWeightChange = (event) => {
     const value = parseInt(event.target.value);
-    setBallWeight(value);
-    setBaseIngredientWeight(numberOfBalls * value);
-    // updateIngredientPercentages(numberOfBalls * value);
+    setBallWeight(value || 0); // Ensure value is a valid number
   };
 
-  const updateIngredientPercentages = (flourWeight) => {
+  const handlePercentageChange = (event, index) => {
+    const value = parseFloat(event.target.value);
     const updatedPercentages = [...ingredientPercentages];
-    for (let i = 1; i < ingredients.length; i++) {
-      updatedPercentages[i] = percentageToGrams(ingredientPercentages[i], flourWeight);
-    }
+    updatedPercentages[index] = isNaN(value) ? 0 : value; // Ensure value is a valid number
     setIngredientPercentages(updatedPercentages);
   };
 
@@ -126,11 +125,9 @@ function Ingredients() {
                 onFocus={handleInputFocus}
                 onChange={(event) => {
                   if (ingredient.isBaseIngredient) {
-                    setBaseIngredientWeight(parseInt(event.target.value));
+                    setBaseIngredientWeight(parseInt(event.target.value) || 0);
                   } else {
-                    const updatedPercentages = [...ingredientPercentages];
-                    updatedPercentages[index] = parseInt(event.target.value);
-                    setIngredientPercentages(updatedPercentages);
+                    handlePercentageChange(event, index);
                   }
                 }}
               />
