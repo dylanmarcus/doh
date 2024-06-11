@@ -39,7 +39,7 @@ function Ingredients() {
   const [selectorOpen, setSelectorOpen] = useState(false);
 
   useEffect(() => {
-    fetch('src/utils/ingredients.json')
+    fetch('/path/to/ingredients.json')
       .then(response => response.json())
       .then(data => {
         setIngredients(data);
@@ -53,7 +53,10 @@ function Ingredients() {
   }, [numberOfBalls, ballWeight, ingredientPercentages, selectedIngredients]);
 
   const handleInputFocus = (event) => {
-    event.target.select();
+    const input = event.target;
+    setTimeout(() => {
+      input.select();
+    }, 0);
   };
 
   const handleNumberOfBallsChange = (event) => {

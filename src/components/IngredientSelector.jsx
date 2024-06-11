@@ -1,4 +1,3 @@
-// src/components/IngredientSelector.jsx
 import React, { useEffect, useState } from 'react';
 import { Button, Checkbox, Grid, Box, Title } from '@mantine/core';
 import { createStyles } from '@mantine/styles';
