@@ -48,7 +48,10 @@ function Ingredients() {
       .then(data => {
         setIngredients(data);
         setIngredientPercentages(data.map(ingredient => ingredient.defaultPercentage));
-        setSelectedIngredients(data.map(() => true));
+
+        // Initialize selected ingredients based on default inclusion/exclusion
+        const defaultSelectedIngredients = data.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true);
+        setSelectedIngredients(defaultSelectedIngredients);
       });
   }, []);
 
