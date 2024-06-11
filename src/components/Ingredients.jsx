@@ -56,8 +56,16 @@ function Ingredients() {
   }, []);
 
   useEffect(() => {
+    const updateBaseIngredientWeight = () => {
+      const totalDoughMass = numberOfBalls * ballWeight;
+      const selectedPercentages = ingredientPercentages.filter((_, index) => selectedIngredients[index] && !ingredients[index].isBaseIngredient);
+      const percentageSum = selectedPercentages.reduce((sum, percentage) => sum + percentage, 0);
+      setBaseIngredientWeight(totalDoughMass / (1 + percentageSum / 100));
+    };
+
     updateBaseIngredientWeight();
-  }, [numberOfBalls, ballWeight, ingredientPercentages, selectedIngredients]);
+  }, [numberOfBalls, ballWeight, ingredientPercentages, selectedIngredients, ingredients]);
+  
 
   const handleInputFocus = (event) => {
     const input = event.target;
@@ -74,13 +82,6 @@ function Ingredients() {
   const handleBallWeightChange = (event) => {
     const value = parseInt(event.target.value) || 0;
     setBallWeight(value);
-  };
-
-  const updateBaseIngredientWeight = () => {
-    const totalDoughMass = numberOfBalls * ballWeight;
-    const selectedPercentages = ingredientPercentages.filter((_, index) => selectedIngredients[index] && !ingredients[index].isBaseIngredient);
-    const percentageSum = selectedPercentages.reduce((sum, percentage) => sum + percentage, 0);
-    setBaseIngredientWeight(totalDoughMass / (1 + percentageSum / 100));
   };
 
   const handlePercentageChange = (index, value) => {
