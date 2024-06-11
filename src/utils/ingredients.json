@@ -1,0 +1,8 @@
+[
+    { "name": "flour", "label": "Flour", "unit": "g", "isBaseIngredient": true, "defaultPercentage": 100 },
+    { "name": "water", "label": "Water", "unit": "g", "isBaseIngredient": false, "defaultPercentage": 60 },
+    { "name": "salt", "label": "Salt", "unit": "g", "isBaseIngredient": false, "defaultPercentage": 2 },
+    { "name": "yeast", "label": "Yeast", "unit": "g", "isBaseIngredient": false, "defaultPercentage": 1 },
+    { "name": "fat", "label": "Fat", "unit": "g", "isBaseIngredient": false, "defaultPercentage": 10 }
+  ]
+  

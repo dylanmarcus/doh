@@ -1,32 +1,57 @@
-import React from 'react';
-import { Checkbox, Button, Box } from '@mantine/core';
+// src/components/IngredientSelector.jsx
+import React, { useEffect, useState } from 'react';
+import { Button, Checkbox, Grid, Box, Title } from '@mantine/core';
+import { createStyles } from '@mantine/styles';
 
-const ingredientsList = [
-  { name: 'flour', label: 'Flour' },
-  { name: 'water', label: 'Water' },
-  { name: 'salt', label: 'Salt' },
-  { name: 'yeast', label: 'Yeast' },
-  { name: 'fat', label: 'Fat' },
-];
+const useStyles = createStyles((theme) => ({
+  ingredientRow: {
+    marginBottom: theme.spacing.md,
+  },
+  ingredientName: {
+    textTransform: 'capitalize',
+    textAlign: 'center',
+    marginBottom: theme.spacing.sm,
+  },
+  centeredGrid: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
+}));
 
 function IngredientSelector({ selectedIngredients, setSelectedIngredients, onClose }) {
-  const handleCheckboxChange = (name) => {
-    setSelectedIngredients((prev) =>
-      prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
-    );
+  const { classes } = useStyles();
+  const [ingredients, setIngredients] = useState([]);
+
+  useEffect(() => {
+    fetch('src/utils/ingredients.json')
+      .then(response => response.json())
+      .then(data => setIngredients(data));
+  }, []);
+
+  const handleCheckboxChange = (index) => {
+    const newSelectedIngredients = [...selectedIngredients];
+    newSelectedIngredients[index] = !newSelectedIngredients[index];
+    setSelectedIngredients(newSelectedIngredients);
   };
 
   return (
     <Box>
-      {ingredientsList.map((ingredient) => (
-        <Checkbox
-          key={ingredient.name}
-          label={ingredient.label}
-          checked={selectedIngredients.includes(ingredient.name)}
-          onChange={() => handleCheckboxChange(ingredient.name)}
-        />
+      {ingredients.map((ingredient, index) => (
+        <Grid key={ingredient.name} className={classes.ingredientRow}>
+          <Grid.Col span={12} className={classes.centeredGrid}>
+            <Checkbox
+              checked={selectedIngredients[index]}
+              onChange={() => handleCheckboxChange(index)}
+              label={ingredient.label}
+            />
+          </Grid.Col>
+        </Grid>
       ))}
-      <Button onClick={onClose}>Close</Button>
+      <Grid className={classes.ingredientRow}>
+        <Grid.Col span={12} className={classes.centeredGrid}>
+          <Button onClick={onClose}>Done</Button>
+        </Grid.Col>
+      </Grid>
     </Box>
   );
 }
