@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Checkbox, Grid, Box, Title } from '@mantine/core';
+import { Button, Checkbox, Box, Title } from '@mantine/core';
 import { createStyles } from '@mantine/styles';
 
 const useStyles = createStyles((theme) => ({
-  ingredientRow: {
-    marginBottom: theme.spacing.md,
-  },
-  ingredientName: {
-    textTransform: 'capitalize',
-    textAlign: 'center',
-    marginBottom: theme.spacing.sm,
-  },
-  centeredGrid: {
+  centeredContent: {
     display: 'flex',
     justifyContent: 'center',
+  },
+  ingredientList: {
+    maxWidth: '300px',
+  },
+  buttonWrapper: {
+    marginTop: theme.spacing.md,
   },
 }));
 
@@ -35,22 +33,24 @@ function IngredientSelector({ selectedIngredients, setSelectedIngredients, onClo
 
   return (
     <Box>
-      {ingredients.map((ingredient, index) => (
-        <Grid key={ingredient.name} className={classes.ingredientRow}>
-          <Grid.Col span={12} className={classes.centeredGrid}>
+      <div className={classes.centeredContent}>
+        <div className={classes.ingredientList}>
+          {ingredients.map((ingredient, index) => (
             <Checkbox
+              key={ingredient.name}
               checked={selectedIngredients[index]}
               onChange={() => handleCheckboxChange(index)}
               label={ingredient.label}
+              style={{ marginBottom: '8px' }}
             />
-          </Grid.Col>
-        </Grid>
-      ))}
-      <Grid className={classes.ingredientRow}>
-        <Grid.Col span={12} className={classes.centeredGrid}>
+          ))}
+        </div>
+      </div>
+      <div className={classes.centeredContent}>
+        <div className={classes.buttonWrapper}>
           <Button onClick={onClose}>Done</Button>
-        </Grid.Col>
-      </Grid>
+        </div>
+      </div>
     </Box>
   );
 }

@@ -1,6 +1,5 @@
-// src/components/Ingredients.jsx
 import React, { useState, useEffect } from 'react';
-import { TextInput, Grid, Box, Title, Button, Modal } from '@mantine/core';
+import { TextInput, Grid, Box, Title, Button, Modal, Group } from '@mantine/core';
 import { createStyles } from '@mantine/styles';
 import { percentageToGrams } from '../utils/calculate';
 import IngredientSelector from './IngredientSelector';
@@ -26,6 +25,11 @@ const useStyles = createStyles((theme) => ({
     gap: theme.spacing.xs,
     justifyContent: 'center',
   },
+  header: {
+    marginBottom: theme.spacing.lg,
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
 }));
 
 function Ingredients() {
@@ -39,7 +43,7 @@ function Ingredients() {
   const [selectorOpen, setSelectorOpen] = useState(false);
 
   useEffect(() => {
-    fetch('/path/to/ingredients.json')
+    fetch('src/utils/ingredients.json')
       .then(response => response.json())
       .then(data => {
         setIngredients(data);
@@ -84,6 +88,9 @@ function Ingredients() {
 
   return (
     <Box>
+      <Group className={classes.header}>
+        <Button onClick={() => setSelectorOpen(true)}>Select Ingredients</Button>
+      </Group>
       <Grid className={classes.ingredientRow}>
         <Grid.Col span={12}>
           <Title order={5} className={classes.ingredientName}>Number of Balls</Title>
@@ -118,7 +125,6 @@ function Ingredients() {
           </div>
         </Grid.Col>
       </Grid>
-      <Button onClick={() => setSelectorOpen(true)}>Select Ingredients</Button>
       <Modal opened={selectorOpen} onClose={() => setSelectorOpen(false)} title="Select Ingredients">
         <IngredientSelector
           selectedIngredients={selectedIngredients}
