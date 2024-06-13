@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppShell, Burger, Group, Skeleton, Title, Button, Text } from '@mantine/core';
+import { AppShell, Burger, Skeleton, Group, Title, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import axios from 'axios';
 import logo from '../src/assets/donut.png';
@@ -7,21 +7,18 @@ import Ingredients from './components/Ingredients';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 
-
 const App = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginOpened, setLoginOpened] = useState(false);
   const [signUpOpened, setSignUpOpened] = useState(false);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setIsAuthenticated(true);
-      // Fetch user data here if needed
     }
   }, []);
 
@@ -29,45 +26,43 @@ const App = () => {
     localStorage.setItem('token', token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setIsAuthenticated(true);
-    // Fetch user data here if needed
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     setIsAuthenticated(false);
-    setUser(null);
   };
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: { base: 60, md: 70, lg: 80 } }}
       navbar={{
-        width: 300,
+        width: { base: 200, md: 300, lg: 400 },
         breakpoint: 'sm',
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
       padding='md'
     >
       <AppShell.Header>
-        <Group h='100%' px='md'>
+        <Group style={{ width: '100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, marginTop: 10, marginLeft: 10, paddingRight: 20 }}>
           <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom='sm' size='sm' />
           <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
-          <Group position="apart">
-            <img src={logo} alt="Logo" style={{ height: '40px' }} />
-            <Title>Doh</Title>
+          <img src={logo} alt="Logo" style={{ height: '50px' }} />
+          <Title order={1} style={{ flexGrow: 1 }}>Doh</Title>
+          <Group>
             {!isAuthenticated && (
-              <Group>
+              <>
                 <Button onClick={() => setLoginOpened(true)}>Login</Button>
                 <Button onClick={() => setSignUpOpened(true)}>Sign Up</Button>
-              </Group>
+              </>
             )}
-            <Login opened={loginOpened} onClose={() => setLoginOpened(false)} onLoginSuccess={handleLogin} />
-            <SignUp opened={signUpOpened} onClose={() => setSignUpOpened(false)} onSignUpSuccess={handleLogin} />
+            {isAuthenticated && (
+              <Button color='red' onClick={handleLogout}>Logout</Button>
+            )}
           </Group>
-          {isAuthenticated && (
-            <Button color='red' onClick={handleLogout}>Logout</Button>
-          )}
+          <Login opened={loginOpened} onClose={() => setLoginOpened(false)} onLoginSuccess={handleLogin} />
+          <SignUp opened={signUpOpened} onClose={() => setSignUpOpened(false)} onSignUpSuccess={handleLogin} />
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p='md'>
@@ -82,7 +77,7 @@ const App = () => {
         <Ingredients />
       </AppShell.Main>
     </AppShell>
-  )
+  );
 }
 
 export default App;
