@@ -59,7 +59,7 @@ const App = () => {
             {!isAuthenticated && (
               <Group>
                 <Button onClick={() => setLoginOpened(true)}>Login</Button>
-                <Button onClick={() => setSignUpOpened(true)}>Register</Button>
+                <Button onClick={() => setSignUpOpened(true)}>Sign Up</Button>
               </Group>
             )}
             <Login opened={loginOpened} onClose={() => setLoginOpened(false)} onLoginSuccess={handleLogin} />
