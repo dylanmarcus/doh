@@ -4,6 +4,8 @@ const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
+// GET /api/recipes
+// Get all recipes for the authenticated user
 router.get('/', protect, async (req, res) => {
   try {
     const recipes = await Recipe.find({ userId: req.user._id });
@@ -13,12 +15,15 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
+// GET /api/recipes/:id
+// Get a specific recipe for the authenticated user
 router.get('/:id', protect, async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) {
       return res.status(404).json({ message: 'Recipe not found' });
     }
+    // Check if the recipe belongs to the authenticated user
     if (recipe.userId.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Not authorized' });
     }
@@ -28,6 +33,8 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
+// POST /api/recipes
+// Create a new recipe for the authenticated user
 router.post('/', protect, async (req, res) => {
   const { name, ingredients, numberOfBalls, ballWeight } = req.body;
   try {
@@ -39,12 +46,15 @@ router.post('/', protect, async (req, res) => {
   }
 });
 
+// PUT /api/recipes/:id
+// Update a recipe for the authenticated user
 router.put('/:id', protect, async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) {
       return res.status(404).json({ message: 'Recipe not found' });
     }
+    // Check if the recipe belongs to the authenticated user
     if (recipe.userId.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Not authorized' });
     }
@@ -62,12 +72,15 @@ router.put('/:id', protect, async (req, res) => {
   }
 });
 
+// DELETE /api/recipes/:id
+// Delete a recipe for the authenticated user
 router.delete('/:id', protect, async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) {
       return res.status(404).json({ message: 'Recipe not found' });
     }
+    // Check if the recipe belongs to the authenticated user
     if (recipe.userId.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Not authorized' });
     }
