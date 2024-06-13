@@ -1,9 +1,15 @@
 const express = require('express');
-const bcrypt = require('bcryptjs'); // Used for hashing passwords
-const jwt = require('jsonwebtoken'); // Used for generating JSON Web Tokens
-const User = require('../models/User'); // User model for database operations
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const { protect } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Prevent caching for the /check-auth route
+router.use('/check-auth', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 
 // Register route
 router.post('/register', async (req, res) => {
@@ -54,6 +60,14 @@ router.post('/login', async (req, res) => {
 // Logout route
 router.post('/logout', async (req, res) => {
   res.json({ message: 'Logout successful' });
+});
+
+// Authentication check route
+router.get('/check-auth', protect, (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Not authorized' });
+  }
+  res.status(200).json({ message: 'User is authenticated', user: req.user });
 });
 
 module.exports = router;
