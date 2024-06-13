@@ -32,7 +32,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-function Ingredients() {
+const Ingredients = () => {
   const { classes } = useStyles();
   const [numberOfBalls, setNumberOfBalls] = useState(1);
   const [ballWeight, setBallWeight] = useState(500);
