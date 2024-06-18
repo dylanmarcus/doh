@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Grid, Box, Title, Button, Modal, Group } from '@mantine/core';
+import { TextInput, Grid, Box, Title, Button, Modal, Container } from '@mantine/core';
 import { createStyles } from '@mantine/styles';
 import { percentageToGrams } from '../utils/calculate';
 import IngredientSelector from './IngredientSelector';
 
 const useStyles = createStyles((theme) => ({
+  recipeName: {
+    marginBottom: theme.spacing.lg,
+  },
   ingredientRow: {
     marginBottom: theme.spacing.md,
   },
@@ -14,7 +17,7 @@ const useStyles = createStyles((theme) => ({
     marginBottom: theme.spacing.sm,
   },
   input: {
-    width: '100px',
+    width: '100%',
   },
   centeredGrid: {
     display: 'flex',
@@ -25,15 +28,11 @@ const useStyles = createStyles((theme) => ({
     gap: theme.spacing.xs,
     justifyContent: 'center',
   },
-  header: {
-    marginBottom: theme.spacing.lg,
-    display: 'flex',
-    justifyContent: 'flex-end',
-  },
 }));
 
 const Ingredients = () => {
   const { classes } = useStyles();
+  const [recipeName, setRecipeName] = useState('');
   const [numberOfBalls, setNumberOfBalls] = useState(1);
   const [ballWeight, setBallWeight] = useState(500);
   const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
@@ -65,13 +64,11 @@ const Ingredients = () => {
 
     updateBaseIngredientWeight();
   }, [numberOfBalls, ballWeight, ingredientPercentages, selectedIngredients, ingredients]);
-  
+
 
   const handleInputFocus = (event) => {
-    const input = event.target;
-    setTimeout(() => {
-      input.select();
-    }, 0);
+    event.target.select();
+
   };
 
   const handleNumberOfBallsChange = (event) => {
@@ -91,88 +88,117 @@ const Ingredients = () => {
   };
 
   return (
-    <Box>
-      <Group className={classes.header}>
-        <Button onClick={() => setSelectorOpen(true)}>Select Ingredients</Button>
-      </Group>
-      <Grid className={classes.ingredientRow}>
-        <Grid.Col span={12}>
-          <Title order={5} className={classes.ingredientName}>Number of Balls</Title>
-        </Grid.Col>
-        <Grid.Col span={12} className={classes.centeredGrid}>
-          <div className={classes.inputWrapper}>
+    <Container padding="md" size="xl" style={{ maxWidth: '100%' }}>
+      <Box>
+        <Grid className={classes.recipeName}>
+          <Grid.Col span={12}>
             <TextInput
-              classNames={{ input: classes.input }}
-              styles={{ input: { textAlign: 'center' } }}
-              placeholder="Number of balls"
-              value={numberOfBalls}
-              onChange={handleNumberOfBallsChange}
-              onFocus={handleInputFocus}
+              placeholder="Recipe Name"
+              value={recipeName}
+              onChange={(event) => setRecipeName(event.target.value)}
+              onFocus={(event) => event.target.select()}
+              styles={{
+                input: {
+                  fontSize: '2.5rem',
+                  fontWeight: 'bold',
+                  lineHeight: '3rem',
+                  padding: '0',
+                  width: '100%',
+                  border: 'none',
+                  borderBottom: '2px solid transparent',
+                  cursor: 'text',
+                }
+              }}
+              variant="unstyled"
             />
-          </div>
-        </Grid.Col>
-      </Grid>
-      <Grid className={classes.ingredientRow}>
-        <Grid.Col span={12}>
-          <Title order={5} className={classes.ingredientName}>Ball Weight</Title>
-        </Grid.Col>
-        <Grid.Col span={12} className={classes.centeredGrid}>
-          <div className={classes.inputWrapper}>
-            <TextInput
-              classNames={{ input: classes.input }}
-              styles={{ input: { textAlign: 'center' } }}
-              placeholder="Ball weight"
-              value={ballWeight}
-              onChange={handleBallWeightChange}
-              onFocus={handleInputFocus}
-            />
-          </div>
-        </Grid.Col>
-      </Grid>
-      <Modal opened={selectorOpen} onClose={() => setSelectorOpen(false)} title="Select Ingredients">
-        <IngredientSelector
-          selectedIngredients={selectedIngredients}
-          setSelectedIngredients={setSelectedIngredients}
-          onClose={() => setSelectorOpen(false)}
-        />
-      </Modal>
-      {ingredients.map((ingredient, index) => (
-        selectedIngredients[index] && (
-          <Grid key={ingredient.name} className={classes.ingredientRow}>
-            <Grid.Col span={12}>
-              <Title order={5} className={classes.ingredientName}>{ingredient.label}</Title>
-            </Grid.Col>
-            <Grid.Col span={12} className={classes.centeredGrid}>
-              <div className={classes.inputWrapper}>
-                <TextInput
-                  classNames={{ input: classes.input }}
-                  styles={{ input: { textAlign: 'right' } }}
-                  placeholder={ingredient.isBaseIngredient ? 'Total baseIngredient weight' : 'Baker\'s percentage'}
-                  rightSection={<span>{ingredient.isBaseIngredient ? 'g' : '%'}</span>}
-                  value={ingredient.isBaseIngredient ? baseIngredientWeight.toFixed(2) : ingredientPercentages[index]}
-                  onFocus={handleInputFocus}
-                  onChange={(event) => {
-                    if (!ingredient.isBaseIngredient) {
-                      handlePercentageChange(index, event.target.value);
-                    }
-                  }}
-                  readOnly={ingredient.isBaseIngredient}
-                />
-                {!ingredient.isBaseIngredient ? (
+          </Grid.Col>
+        </Grid>
+        <Grid>
+          <Grid.Col>
+            <div>
+              <Button onClick={() => setSelectorOpen(true)}>Select Ingredients</Button>
+            </div>
+          </Grid.Col>
+        </Grid>
+        <Grid className={classes.ingredientRow}>
+          <Grid.Col span={12}>
+            <Title order={5} className={classes.ingredientName}>Number of Balls</Title>
+          </Grid.Col>
+          <Grid.Col span={12} className={classes.centeredGrid}>
+            <div className={classes.inputWrapper}>
+              <TextInput
+                classNames={{ input: classes.input }}
+                styles={{ input: { textAlign: 'center' } }}
+                placeholder="Number of balls"
+                value={numberOfBalls}
+                onChange={handleNumberOfBallsChange}
+                onFocus={handleInputFocus}
+              />
+            </div>
+          </Grid.Col>
+        </Grid>
+        <Grid className={classes.ingredientRow}>
+          <Grid.Col span={12}>
+            <Title order={5} className={classes.ingredientName}>Ball Weight</Title>
+          </Grid.Col>
+          <Grid.Col span={12} className={classes.centeredGrid}>
+            <div className={classes.inputWrapper}>
+              <TextInput
+                classNames={{ input: classes.input }}
+                styles={{ input: { textAlign: 'center' } }}
+                placeholder="Ball weight"
+                value={ballWeight}
+                onChange={handleBallWeightChange}
+                onFocus={handleInputFocus}
+              />
+            </div>
+          </Grid.Col>
+        </Grid>
+        <Modal opened={selectorOpen} onClose={() => setSelectorOpen(false)} title="Select Ingredients">
+          <IngredientSelector
+            selectedIngredients={selectedIngredients}
+            setSelectedIngredients={setSelectedIngredients}
+            onClose={() => setSelectorOpen(false)}
+          />
+        </Modal>
+        {ingredients.map((ingredient, index) => (
+          selectedIngredients[index] && (
+            <Grid key={ingredient.name} className={classes.ingredientRow}>
+              <Grid.Col span={12}>
+                <Title order={5} className={classes.ingredientName}>{ingredient.label}</Title>
+              </Grid.Col>
+              <Grid.Col span={12} className={classes.centeredGrid}>
+                <div className={classes.inputWrapper}>
                   <TextInput
                     classNames={{ input: classes.input }}
                     styles={{ input: { textAlign: 'right' } }}
-                    readOnly
-                    value={percentageToGrams(ingredientPercentages[index], baseIngredientWeight).toFixed(2)}
-                    rightSection={<span>g</span>}
+                    placeholder={ingredient.isBaseIngredient ? 'Total baseIngredient weight' : 'Baker\'s percentage'}
+                    rightSection={<span>{ingredient.isBaseIngredient ? 'g' : '%'}</span>}
+                    value={ingredient.isBaseIngredient ? baseIngredientWeight.toFixed(2) : ingredientPercentages[index]}
+                    onFocus={handleInputFocus}
+                    onChange={(event) => {
+                      if (!ingredient.isBaseIngredient) {
+                        handlePercentageChange(index, event.target.value);
+                      }
+                    }}
+                    readOnly={ingredient.isBaseIngredient}
                   />
-                ) : null}
-              </div>
-            </Grid.Col>
-          </Grid>
-        )
-      ))}
-    </Box>
+                  {!ingredient.isBaseIngredient ? (
+                    <TextInput
+                      classNames={{ input: classes.input }}
+                      styles={{ input: { textAlign: 'right' } }}
+                      readOnly
+                      value={percentageToGrams(ingredientPercentages[index], baseIngredientWeight).toFixed(2)}
+                      rightSection={<span>g</span>}
+                    />
+                  ) : null}
+                </div>
+              </Grid.Col>
+            </Grid>
+          )
+        ))}
+      </Box>
+    </Container>
   );
 }
 
