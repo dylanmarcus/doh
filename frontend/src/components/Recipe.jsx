@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Grid, Box, Title, Button, Modal, Container } from '@mantine/core';
+import { TextInput, Text, Grid, Box, Title, Button, Modal, Container } from '@mantine/core';
 import { createStyles } from '@mantine/styles';
 import { percentageToGrams } from '../utils/calculate';
 import IngredientSelector from './IngredientSelector';
@@ -42,6 +42,7 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
   const [ingredients, setIngredients] = useState([]);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [recipeId, setRecipeId] = useState(recipe ? recipe._id : null);
+  const [deleteDialogOpened, setDeleteDialogOpened] = useState(false);
 
   const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
 
@@ -52,7 +53,7 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
         setIngredients(data);
         setIngredientPercentages(data.map(ingredient => ingredient.defaultPercentage));
 
-        // Initialize selected ingredients based on default inclusion/exclusion
+        // Initialize selected ingredients based on default ingredients
         const defaultSelectedIngredients = data.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true);
         setSelectedIngredients(defaultSelectedIngredients);
       });
@@ -77,6 +78,10 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
       setIngredientPercentages(recipe.ingredients.map(ing => ing.percentage));
       setSelectedIngredients(recipe.ingredients.map(ing => ing.selected));
     }
+  }, [recipe]);
+
+  useEffect(() => {
+    setRecipeId(recipe ? recipe._id : null);
   }, [recipe]);
 
   const handleInputFocus = (event) => {
@@ -126,6 +131,18 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
     }
   };
 
+  const handleDeleteRecipe = async () => {
+    try {
+      await axios.delete(`/api/recipes/${recipeId}`);
+      onRecipeSaved(); // Trigger a refresh or redirect after deletion
+      alert('Recipe deleted successfully!');
+    } catch (error) {
+      console.error('Failed to delete recipe:', error);
+      alert('Failed to delete recipe');
+    }
+    setDeleteDialogOpened(false); // Close the confirmation dialog
+  };
+
   return (
     <Container padding="md" size="xl" style={{ maxWidth: '100%' }}>
       <Box>
@@ -140,7 +157,7 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
                 input: {
                   fontSize: '2.5rem',
                   fontWeight: 'bold',
-                  lineHeight: '3rem',
+                  lineHeight: '6rem',
                   padding: '0',
                   width: '100%',
                   border: 'none',
@@ -155,8 +172,22 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
         <Grid>
           <Grid.Col>
             <div>
-            <Button onClick={handleSaveRecipe}>{recipe ? 'Update Recipe' : 'Save Recipe'}</Button>
+              <Button onClick={handleSaveRecipe}>{recipe ? 'Update' : 'Save'}</Button>
             </div>
+            <div>
+              {recipeId && (
+                <Button color="red" onClick={() => setDeleteDialogOpened(true)}>Delete</Button>
+              )}
+            </div>
+            <Modal
+                opened={deleteDialogOpened}
+                onClose={() => setDeleteDialogOpened(false)}
+                title="Confirm Deletion"
+              >
+                <Text>Are you sure you want to delete this recipe?</Text>
+                <Button color="red" onClick={handleDeleteRecipe}>Yes</Button>
+                <Button onClick={() => setDeleteDialogOpened(false)}>No</Button>
+              </Modal>
           </Grid.Col>
         </Grid>
         <Grid>
