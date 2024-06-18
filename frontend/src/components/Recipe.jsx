@@ -3,6 +3,7 @@ import { TextInput, Grid, Box, Title, Button, Modal, Container } from '@mantine/
 import { createStyles } from '@mantine/styles';
 import { percentageToGrams } from '../utils/calculate';
 import IngredientSelector from './IngredientSelector';
+import axios from 'axios';
 
 const useStyles = createStyles((theme) => ({
   recipeName: {
@@ -40,6 +41,7 @@ const Recipe = () => {
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [ingredients, setIngredients] = useState([]);
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const [recipeId, setRecipeId] = useState(null);
 
   useEffect(() => {
     fetch('src/utils/ingredients.json')
@@ -87,6 +89,31 @@ const Recipe = () => {
     setIngredientPercentages(newPercentages);
   };
 
+  const handleSaveRecipe = async () => {
+    const recipeData = {
+      name: recipeName,
+      ingredients: selectedIngredients.map((selected, index) => ({
+        label: ingredients[index].label,
+        percentage: ingredientPercentages[index],
+        selected
+      })),
+      numberOfBalls,
+      ballWeight
+    };
+
+    const url = recipeId ? `/api/recipes/${recipeId}` : '/api/recipes/';
+    const method = recipeId ? 'put' : 'post';
+
+    try {
+      const response = await axios[method](url, recipeData);
+      if (!recipeId) setRecipeId(response.data._id);
+      alert('Recipe saved successfully!');
+    } catch (error) {
+      console.error('Failed to save recipe:', error);
+      alert('Failed to save recipe');
+    }
+  };
+
   return (
     <Container padding="md" size="xl" style={{ maxWidth: '100%' }}>
       <Box>
@@ -111,6 +138,13 @@ const Recipe = () => {
               }}
               variant="unstyled"
             />
+          </Grid.Col>
+        </Grid>
+        <Grid>
+          <Grid.Col>
+            <div>
+              <Button onClick={handleSaveRecipe}>Save Recipe</Button>
+            </div>
           </Grid.Col>
         </Grid>
         <Grid>
