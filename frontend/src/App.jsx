@@ -3,7 +3,7 @@ import { AppShell, Burger, Skeleton, Group, Title, Button } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import axios from 'axios';
 import logo from '../src/assets/donut.png';
-import Ingredients from './components/Ingredients';
+import Recipe from './components/Recipe';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 
@@ -74,7 +74,7 @@ const App = () => {
           ))}
       </AppShell.Navbar>
       <AppShell.Main>
-        <Ingredients />
+        <Recipe />
       </AppShell.Main>
     </AppShell>
   );

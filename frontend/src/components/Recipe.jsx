@@ -30,7 +30,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const Ingredients = () => {
+const Recipe = () => {
   const { classes } = useStyles();
   const [recipeName, setRecipeName] = useState('');
   const [numberOfBalls, setNumberOfBalls] = useState(1);
@@ -202,4 +202,4 @@ const Ingredients = () => {
   );
 }
 
-export default Ingredients;
+export default Recipe;
