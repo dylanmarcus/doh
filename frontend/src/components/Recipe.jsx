@@ -85,8 +85,7 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
   }, [recipe]);
 
   const handleInputFocus = (event) => {
-    event.target.select();
-
+    setTimeout(() => event.target.select(), 10);
   };
 
   const handleNumberOfBallsChange = (event) => {
