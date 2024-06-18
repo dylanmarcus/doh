@@ -3,7 +3,7 @@ import { AppShell, Burger, Skeleton, Group, Title, Button } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks';
 import axios from 'axios';
 import logo from '../src/assets/donut.png';
-import Ingredients from './components/Ingredients';
+import Recipe from './components/Recipe';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 
@@ -13,6 +13,9 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginOpened, setLoginOpened] = useState(false);
   const [signUpOpened, setSignUpOpened] = useState(false);
+  const [recipes, setRecipes] = useState([]);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [recipeChangeTrigger, setRecipeChangeTrigger] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -21,6 +24,12 @@ const App = () => {
       setIsAuthenticated(true);
     }
   }, []);
+
+  useEffect(() => {
+    axios.get('/api/recipes')
+      .then(response => setRecipes(response.data))
+      .catch(error => console.error('Failed to fetch recipes:', error));
+  }, [recipeChangeTrigger]);
 
   const handleLogin = (token) => {
     localStorage.setItem('token', token);
@@ -32,6 +41,14 @@ const App = () => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     setIsAuthenticated(false);
+  };
+
+  const selectRecipe = (id) => {
+    axios.get(`/api/recipes/${id}`)
+      .then(response => {
+        setSelectedRecipe(response.data);
+      })
+      .catch(error => console.error('Failed to fetch recipe details:', error));
   };
 
   return (
@@ -66,15 +83,14 @@ const App = () => {
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p='md'>
-        Navbar
-        {Array(15)
-          .fill(0)
-          .map((_, index) => (
-            <Skeleton key={index} h={28} mt='sm' animate={false} />
-          ))}
+        {recipes.map(recipe => (
+          <Button key={recipe._id} onClick={() => selectRecipe(recipe._id)}>
+            {recipe.name}
+          </Button>
+        ))}
       </AppShell.Navbar>
       <AppShell.Main>
-        <Ingredients />
+        <Recipe recipe={selectedRecipe} onRecipeSaved={() => setRecipeChangeTrigger(prev => !prev)} />
       </AppShell.Main>
     </AppShell>
   );
