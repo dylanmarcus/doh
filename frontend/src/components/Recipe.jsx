@@ -31,17 +31,19 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const Recipe = () => {
+const Recipe = ({ recipe, onRecipeSaved }) => {
   const { classes } = useStyles();
-  const [recipeName, setRecipeName] = useState('');
-  const [numberOfBalls, setNumberOfBalls] = useState(1);
-  const [ballWeight, setBallWeight] = useState(500);
-  const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
-  const [ingredientPercentages, setIngredientPercentages] = useState([]);
-  const [selectedIngredients, setSelectedIngredients] = useState([]);
+
+  const [recipeName, setRecipeName] = useState(recipe ? recipe.name : '');
+  const [numberOfBalls, setNumberOfBalls] = useState(recipe ? recipe.numberOfBalls : 1);
+  const [ballWeight, setBallWeight] = useState(recipe ? recipe.ballWeight : 500);
+  const [ingredientPercentages, setIngredientPercentages] = useState(recipe ? recipe.ingredients.map(ing => ing.percentage) : []);
+  const [selectedIngredients, setSelectedIngredients] = useState(recipe ? recipe.ingredients.map(ing => ing.selected) : []);
   const [ingredients, setIngredients] = useState([]);
   const [selectorOpen, setSelectorOpen] = useState(false);
-  const [recipeId, setRecipeId] = useState(null);
+  const [recipeId, setRecipeId] = useState(recipe ? recipe._id : null);
+
+  const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
 
   useEffect(() => {
     fetch('src/utils/ingredients.json')
@@ -67,6 +69,15 @@ const Recipe = () => {
     updateBaseIngredientWeight();
   }, [numberOfBalls, ballWeight, ingredientPercentages, selectedIngredients, ingredients]);
 
+  useEffect(() => {
+    if (recipe) {
+      setRecipeName(recipe.name);
+      setNumberOfBalls(recipe.numberOfBalls);
+      setBallWeight(recipe.ballWeight);
+      setIngredientPercentages(recipe.ingredients.map(ing => ing.percentage));
+      setSelectedIngredients(recipe.ingredients.map(ing => ing.selected));
+    }
+  }, [recipe]);
 
   const handleInputFocus = (event) => {
     event.target.select();
@@ -107,6 +118,7 @@ const Recipe = () => {
     try {
       const response = await axios[method](url, recipeData);
       if (!recipeId) setRecipeId(response.data._id);
+      onRecipeSaved();
       alert('Recipe saved successfully!');
     } catch (error) {
       console.error('Failed to save recipe:', error);
@@ -143,7 +155,7 @@ const Recipe = () => {
         <Grid>
           <Grid.Col>
             <div>
-              <Button onClick={handleSaveRecipe}>Save Recipe</Button>
+            <Button onClick={handleSaveRecipe}>{recipe ? 'Update Recipe' : 'Save Recipe'}</Button>
             </div>
           </Grid.Col>
         </Grid>
