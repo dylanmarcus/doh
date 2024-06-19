@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Text, Grid, Box, Title, Button, Modal, Container } from '@mantine/core';
+import { TextInput, Text, Grid, Box, Title, Button, Modal } from '@mantine/core';
 import { createStyles } from '@mantine/styles';
 import { percentageToGrams } from '../utils/calculate';
 import IngredientSelector from './IngredientSelector';
@@ -84,6 +84,12 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
     setRecipeId(recipe ? recipe._id : null);
   }, [recipe]);
 
+  useEffect(() => {
+    if (!recipe) {
+      resetRecipe();
+    }
+  }, [recipe]);
+
   const handleInputFocus = (event) => {
     setTimeout(() => event.target.select(), 10);
   };
@@ -134,6 +140,7 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
     try {
       await axios.delete(`/api/recipes/${recipeId}`);
       onRecipeSaved(); // Trigger a refresh or redirect after deletion
+      resetRecipe();
       alert('Recipe deleted successfully!');
     } catch (error) {
       console.error('Failed to delete recipe:', error);
@@ -142,139 +149,147 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
     setDeleteDialogOpened(false); // Close the confirmation dialog
   };
 
+  const resetRecipe = () => {
+    console.log('Resetting recipe to default state');
+    setRecipeName('');
+    setNumberOfBalls(1);
+    setBallWeight(500);
+    setIngredientPercentages(ingredients.map(ingredient => ingredient.defaultPercentage));
+    setSelectedIngredients(ingredients.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true));
+    setRecipeId(null);
+  };
+
   return (
-    <Container padding="md" size="xl" style={{ maxWidth: '100%' }}>
-      <Box>
-        <Grid className={classes.recipeName}>
-          <Grid.Col span={12}>
-            <TextInput
-              placeholder="Recipe Name"
-              value={recipeName}
-              onChange={(event) => setRecipeName(event.target.value)}
-              onFocus={(event) => event.target.select()}
-              styles={{
-                input: {
-                  fontSize: '2.5rem',
-                  fontWeight: 'bold',
-                  lineHeight: '6rem',
-                  padding: '0',
-                  width: '100%',
-                  border: 'none',
-                  borderBottom: '2px solid transparent',
-                  cursor: 'text',
-                }
-              }}
-              variant="unstyled"
-            />
-          </Grid.Col>
-        </Grid>
-        <Grid>
-          <Grid.Col>
-            <div>
-              <Button onClick={handleSaveRecipe}>{recipe ? 'Update' : 'Save'}</Button>
-            </div>
-            <div>
-              {recipeId && (
-                <Button color="red" onClick={() => setDeleteDialogOpened(true)}>Delete</Button>
-              )}
-            </div>
-            <Modal
-                opened={deleteDialogOpened}
-                onClose={() => setDeleteDialogOpened(false)}
-                title="Confirm Deletion"
-              >
-                <Text>Are you sure you want to delete this recipe?</Text>
-                <Button color="red" onClick={handleDeleteRecipe}>Yes</Button>
-                <Button onClick={() => setDeleteDialogOpened(false)}>No</Button>
-              </Modal>
-          </Grid.Col>
-        </Grid>
-        <Grid>
-          <Grid.Col>
-            <div>
-              <Button onClick={() => setSelectorOpen(true)}>Select Ingredients</Button>
-            </div>
-          </Grid.Col>
-        </Grid>
-        <Grid className={classes.ingredientRow}>
-          <Grid.Col span={12}>
-            <Title order={5} className={classes.ingredientName}>Number of Balls</Title>
-          </Grid.Col>
-          <Grid.Col span={12} className={classes.centeredGrid}>
-            <div className={classes.inputWrapper}>
-              <TextInput
-                classNames={{ input: classes.input }}
-                styles={{ input: { textAlign: 'center' } }}
-                placeholder="Number of balls"
-                value={numberOfBalls}
-                onChange={handleNumberOfBallsChange}
-                onFocus={handleInputFocus}
-              />
-            </div>
-          </Grid.Col>
-        </Grid>
-        <Grid className={classes.ingredientRow}>
-          <Grid.Col span={12}>
-            <Title order={5} className={classes.ingredientName}>Ball Weight</Title>
-          </Grid.Col>
-          <Grid.Col span={12} className={classes.centeredGrid}>
-            <div className={classes.inputWrapper}>
-              <TextInput
-                classNames={{ input: classes.input }}
-                styles={{ input: { textAlign: 'center' } }}
-                placeholder="Ball weight"
-                value={ballWeight}
-                onChange={handleBallWeightChange}
-                onFocus={handleInputFocus}
-              />
-            </div>
-          </Grid.Col>
-        </Grid>
-        <Modal opened={selectorOpen} onClose={() => setSelectorOpen(false)} title="Select Ingredients">
-          <IngredientSelector
-            selectedIngredients={selectedIngredients}
-            setSelectedIngredients={setSelectedIngredients}
-            onClose={() => setSelectorOpen(false)}
+    <Box>
+      <Grid className={classes.recipeName}>
+        <Grid.Col span={12}>
+          <TextInput
+            placeholder="Recipe Name"
+            value={recipeName}
+            onChange={(event) => setRecipeName(event.target.value)}
+            onFocus={(event) => event.target.select()}
+            styles={{
+              input: {
+                fontSize: '2.5rem',
+                fontWeight: 'bold',
+                lineHeight: '6rem',
+                padding: '0',
+                width: '100%',
+                border: 'none',
+                borderBottom: '2px solid transparent',
+                cursor: 'text',
+              }
+            }}
+            variant="unstyled"
           />
-        </Modal>
-        {ingredients.map((ingredient, index) => (
-          selectedIngredients[index] && (
-            <Grid key={ingredient.name} className={classes.ingredientRow}>
-              <Grid.Col span={12}>
-                <Title order={5} className={classes.ingredientName}>{ingredient.label}</Title>
-              </Grid.Col>
-              <Grid.Col span={12} className={classes.centeredGrid}>
-                <div className={classes.inputWrapper}>
+        </Grid.Col>
+      </Grid>
+      <Grid>
+        <Grid.Col>
+          <div>
+            <Button onClick={handleSaveRecipe}>{recipe ? 'Update' : 'Save'}</Button>
+          </div>
+          <div>
+            {recipeId && (
+              <Button color="red" onClick={() => setDeleteDialogOpened(true)}>Delete</Button>
+            )}
+          </div>
+          <Modal
+            opened={deleteDialogOpened}
+            onClose={() => setDeleteDialogOpened(false)}
+            title="Confirm Deletion"
+          >
+            <Text>Are you sure you want to delete this recipe?</Text>
+            <Button color="red" onClick={handleDeleteRecipe}>Yes</Button>
+            <Button onClick={() => setDeleteDialogOpened(false)}>No</Button>
+          </Modal>
+        </Grid.Col>
+      </Grid>
+      <Grid>
+        <Grid.Col>
+          <div>
+            <Button onClick={() => setSelectorOpen(true)}>Select Ingredients</Button>
+          </div>
+        </Grid.Col>
+      </Grid>
+      <Grid className={classes.ingredientRow}>
+        <Grid.Col span={12}>
+          <Title order={5} className={classes.ingredientName}>Number of Balls</Title>
+        </Grid.Col>
+        <Grid.Col span={12} className={classes.centeredGrid}>
+          <div className={classes.inputWrapper}>
+            <TextInput
+              classNames={{ input: classes.input }}
+              styles={{ input: { textAlign: 'center' } }}
+              placeholder="Number of balls"
+              value={numberOfBalls}
+              onChange={handleNumberOfBallsChange}
+              onFocus={handleInputFocus}
+            />
+          </div>
+        </Grid.Col>
+      </Grid>
+      <Grid className={classes.ingredientRow}>
+        <Grid.Col span={12}>
+          <Title order={5} className={classes.ingredientName}>Ball Weight</Title>
+        </Grid.Col>
+        <Grid.Col span={12} className={classes.centeredGrid}>
+          <div className={classes.inputWrapper}>
+            <TextInput
+              classNames={{ input: classes.input }}
+              styles={{ input: { textAlign: 'center' } }}
+              placeholder="Ball weight"
+              value={ballWeight}
+              onChange={handleBallWeightChange}
+              onFocus={handleInputFocus}
+            />
+          </div>
+        </Grid.Col>
+      </Grid>
+      <Modal opened={selectorOpen} onClose={() => setSelectorOpen(false)} title="Select Ingredients">
+        <IngredientSelector
+          selectedIngredients={selectedIngredients}
+          setSelectedIngredients={setSelectedIngredients}
+          onClose={() => setSelectorOpen(false)}
+        />
+      </Modal>
+      {ingredients.map((ingredient, index) => (
+        selectedIngredients[index] && (
+          <Grid key={ingredient.name} className={classes.ingredientRow}>
+            <Grid.Col span={12}>
+              <Title order={5} className={classes.ingredientName}>{ingredient.label}</Title>
+            </Grid.Col>
+            <Grid.Col span={12} className={classes.centeredGrid}>
+              <div className={classes.inputWrapper}>
+                <TextInput
+                  classNames={{ input: classes.input }}
+                  styles={{ input: { textAlign: 'right' } }}
+                  placeholder={ingredient.isBaseIngredient ? 'Total baseIngredient weight' : 'Baker\'s percentage'}
+                  rightSection={<span>{ingredient.isBaseIngredient ? 'g' : '%'}</span>}
+                  value={ingredient.isBaseIngredient ? baseIngredientWeight.toFixed(2) : ingredientPercentages[index]}
+                  onFocus={handleInputFocus}
+                  onChange={(event) => {
+                    if (!ingredient.isBaseIngredient) {
+                      handlePercentageChange(index, event.target.value);
+                    }
+                  }}
+                  readOnly={ingredient.isBaseIngredient}
+                />
+                {!ingredient.isBaseIngredient ? (
                   <TextInput
                     classNames={{ input: classes.input }}
                     styles={{ input: { textAlign: 'right' } }}
-                    placeholder={ingredient.isBaseIngredient ? 'Total baseIngredient weight' : 'Baker\'s percentage'}
-                    rightSection={<span>{ingredient.isBaseIngredient ? 'g' : '%'}</span>}
-                    value={ingredient.isBaseIngredient ? baseIngredientWeight.toFixed(2) : ingredientPercentages[index]}
-                    onFocus={handleInputFocus}
-                    onChange={(event) => {
-                      if (!ingredient.isBaseIngredient) {
-                        handlePercentageChange(index, event.target.value);
-                      }
-                    }}
-                    readOnly={ingredient.isBaseIngredient}
+                    readOnly
+                    value={percentageToGrams(ingredientPercentages[index], baseIngredientWeight).toFixed(2)}
+                    rightSection={<span>g</span>}
                   />
-                  {!ingredient.isBaseIngredient ? (
-                    <TextInput
-                      classNames={{ input: classes.input }}
-                      styles={{ input: { textAlign: 'right' } }}
-                      readOnly
-                      value={percentageToGrams(ingredientPercentages[index], baseIngredientWeight).toFixed(2)}
-                      rightSection={<span>g</span>}
-                    />
-                  ) : null}
-                </div>
-              </Grid.Col>
-            </Grid>
-          )
-        ))}
-      </Box>
-    </Container>
+                ) : null}
+              </div>
+            </Grid.Col>
+          </Grid>
+        )
+      ))}
+    </Box>
   );
 }
 

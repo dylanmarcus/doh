@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AppShell, Burger, Skeleton, Group, Title, Button } from '@mantine/core';
+import { AppShell, Burger, Grid, Group, Container, Title, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import axios from 'axios';
 import logo from '../src/assets/donut.png';
@@ -90,7 +90,16 @@ const App = () => {
         ))}
       </AppShell.Navbar>
       <AppShell.Main>
-        <Recipe recipe={selectedRecipe} onRecipeSaved={() => setRecipeChangeTrigger(prev => !prev)} />
+        <Container padding="md" size="xl" style={{ maxWidth: '100%' }}>
+          <Grid>
+            <Grid.Col span={12} style={{ marginBottom: 20 }}>
+              <div>
+                <Button onClick={() => setSelectedRecipe(null)}>New Recipe</Button>
+              </div>
+            </Grid.Col>
+          </Grid>
+          <Recipe recipe={selectedRecipe} onRecipeSaved={() => setRecipeChangeTrigger(prev => !prev)} />
+        </Container>
       </AppShell.Main>
     </AppShell>
   );
