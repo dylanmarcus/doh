@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput, Text, Grid, Box, Title, Button, Modal } from '@mantine/core';
 import { createStyles } from '@mantine/styles';
-import { percentageToGrams } from '../utils/calculate';
 import IngredientSelector from './IngredientSelector';
 import axios from 'axios';
 
@@ -157,6 +156,10 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
     setIngredientPercentages(ingredients.map(ingredient => ingredient.defaultPercentage));
     setSelectedIngredients(ingredients.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true));
     setRecipeId(null);
+  };
+
+  const percentageToGrams = (bakerPercentage, baseIngredient) => {
+    return (bakerPercentage / 100) * baseIngredient;
   };
 
   return (
