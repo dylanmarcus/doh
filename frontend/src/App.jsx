@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppShell, Burger, Grid, Group, Container, Title, Button, ActionIcon, Tooltip } from '@mantine/core';
 import { FaPlus } from 'react-icons/fa';
 import { useDisclosure } from '@mantine/hooks';
@@ -17,6 +17,8 @@ const App = () => {
   const [recipes, setRecipes] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [recipeChangeTrigger, setRecipeChangeTrigger] = useState(false);
+  const navbarRef = useRef(null);
+  const [navbarWidth, setNavbarWidth] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -35,6 +37,20 @@ const App = () => {
       setRecipes([]);
     }
   }, [recipeChangeTrigger, isAuthenticated]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (navbarRef.current) {
+        setNavbarWidth(navbarRef.current.offsetWidth);
+      }
+    };
+
+    // Measure initially in case the initial width is needed on load
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLogin = (token) => {
     localStorage.setItem('token', token);
@@ -75,11 +91,11 @@ const App = () => {
             placement="bottom"
             withArrow
             disabled={mobileOpened || desktopOpened}
-            >
-          <span>
-          <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom='sm' size='sm' />
-          <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
-          </span>
+          >
+            <span>
+              <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom='sm' size='sm' />
+              <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
+            </span>
           </Tooltip>
           <img src={logo} alt="Logo" style={{ height: '50px' }} />
           <Title order={1} style={{ flexGrow: 1 }}>Doh</Title>
@@ -98,7 +114,7 @@ const App = () => {
           <SignUp opened={signUpOpened} onClose={() => setSignUpOpened(false)} onSignUpSuccess={handleLogin} />
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar p='md'>
+      <AppShell.Navbar ref={navbarRef} p='md'>
         {recipes.map(recipe => (
           <Button key={recipe._id} onClick={() => selectRecipe(recipe._id)}>
             {recipe.name}
@@ -134,7 +150,12 @@ const App = () => {
               </div>
             </Grid.Col>
           </Grid>
-          <Recipe recipe={selectedRecipe} onRecipeSaved={() => setRecipeChangeTrigger(prev => !prev)} navbarWidth={desktopOpened ? 400 : 0} />
+          <Recipe
+            recipe={selectedRecipe}
+            onRecipeSaved={() => setRecipeChangeTrigger(prev => !prev)}
+            navbarWidth={navbarWidth}
+            navbarOpened={mobileOpened || desktopOpened}
+          />
         </Container>
       </AppShell.Main>
     </AppShell>

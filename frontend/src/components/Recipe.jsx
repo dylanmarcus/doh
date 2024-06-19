@@ -31,7 +31,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const Recipe = ({ recipe, onRecipeSaved, navbarWidth }) => {
+const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
   const { classes } = useStyles();
 
   const [recipeName, setRecipeName] = useState(recipe ? recipe.name : '');
@@ -232,7 +232,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth }) => {
             onClick={() => setSelectorOpen(true)}
             style={{
               position: 'fixed',
-              left: `${navbarWidth + 30}px`,
+              left: navbarOpened && window.innerWidth > 768 ? `${navbarWidth + 30}px` : '30px',
               top: 'calc(100% - 50px)',
               transform: 'translateY(-50%)',
               transition: 'left 200ms ease',
@@ -243,6 +243,13 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth }) => {
           </Button>
         </Tooltip>
       </Grid>
+      <Modal opened={selectorOpen} onClose={() => setSelectorOpen(false)} title="Select Ingredients">
+        <IngredientSelector
+          selectedIngredients={selectedIngredients}
+          setSelectedIngredients={setSelectedIngredients}
+          onClose={() => setSelectorOpen(false)}
+        />
+      </Modal>
       <Grid className={classes.ingredientRow}>
         <Grid.Col span={12}>
           <Title order={5} className={classes.ingredientName}>Number of Balls</Title>
@@ -277,13 +284,6 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth }) => {
           </div>
         </Grid.Col>
       </Grid>
-      <Modal opened={selectorOpen} onClose={() => setSelectorOpen(false)} title="Select Ingredients">
-        <IngredientSelector
-          selectedIngredients={selectedIngredients}
-          setSelectedIngredients={setSelectedIngredients}
-          onClose={() => setSelectorOpen(false)}
-        />
-      </Modal>
       {ingredients.map((ingredient, index) => (
         selectedIngredients[index] && (
           <Grid key={ingredient.name} className={classes.ingredientRow}>
