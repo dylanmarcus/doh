@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { AppShell, Burger, Grid, Group, Container, Title, Button } from '@mantine/core';
+import React, { useState, useEffect, useRef } from 'react';
+import { AppShell, Burger, Grid, Group, Container, Title, Button, ActionIcon, Tooltip } from '@mantine/core';
+import { FaPlus } from 'react-icons/fa';
 import { useDisclosure } from '@mantine/hooks';
 import axios from 'axios';
 import logo from '../src/assets/donut.png';
@@ -16,6 +17,8 @@ const App = () => {
   const [recipes, setRecipes] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [recipeChangeTrigger, setRecipeChangeTrigger] = useState(false);
+  const navbarRef = useRef(null);
+  const [navbarWidth, setNavbarWidth] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -26,21 +29,41 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    axios.get('/api/recipes')
-      .then(response => setRecipes(response.data))
-      .catch(error => console.error('Failed to fetch recipes:', error));
-  }, [recipeChangeTrigger]);
+    if (isAuthenticated) {
+      axios.get('/api/recipes')
+        .then(response => setRecipes(response.data))
+        .catch(error => console.error('Failed to fetch recipes:', error));
+    } else {
+      setRecipes([]);
+    }
+  }, [recipeChangeTrigger, isAuthenticated]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (navbarRef.current) {
+        setNavbarWidth(navbarRef.current.offsetWidth);
+      }
+    };
+
+    // Measure initially in case the initial width is needed on load
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLogin = (token) => {
     localStorage.setItem('token', token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     setIsAuthenticated(true);
+    setRecipeChangeTrigger(prev => !prev);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     delete axios.defaults.headers.common['Authorization'];
     setIsAuthenticated(false);
+    setRecipeChangeTrigger(prev => !prev);
   };
 
   const selectRecipe = (id) => {
@@ -63,8 +86,17 @@ const App = () => {
     >
       <AppShell.Header>
         <Group style={{ width: '100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, marginTop: 10, marginLeft: 10, paddingRight: 20 }}>
-          <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom='sm' size='sm' />
-          <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
+          <Tooltip
+            label="Saved recipes"
+            placement="bottom"
+            withArrow
+            disabled={mobileOpened || desktopOpened}
+          >
+            <span>
+              <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom='sm' size='sm' />
+              <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
+            </span>
+          </Tooltip>
           <img src={logo} alt="Logo" style={{ height: '50px' }} />
           <Title order={1} style={{ flexGrow: 1 }}>Doh</Title>
           <Group>
@@ -82,7 +114,7 @@ const App = () => {
           <SignUp opened={signUpOpened} onClose={() => setSignUpOpened(false)} onSignUpSuccess={handleLogin} />
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar p='md'>
+      <AppShell.Navbar ref={navbarRef} p='md'>
         {recipes.map(recipe => (
           <Button key={recipe._id} onClick={() => selectRecipe(recipe._id)}>
             {recipe.name}
@@ -92,13 +124,38 @@ const App = () => {
       <AppShell.Main>
         <Container padding="md" size="xl" style={{ maxWidth: '100%' }}>
           <Grid>
-            <Grid.Col span={12} style={{ marginBottom: 20 }}>
+            <Grid.Col span={12} style={{ display: 'flex', justifyContent: 'right', alignItems: 'center', marginBottom: '-2rem' }}>
               <div>
-                <Button onClick={() => setSelectedRecipe(null)}>New Recipe</Button>
+                <Tooltip
+                  label="Add new recipe"
+                  position="left"
+                  withArrow
+                >
+                  <ActionIcon
+                    variant="filled"
+                    size="xl"
+                    onClick={() => setSelectedRecipe(null)}
+                    sx={(theme) => ({
+                      backgroundColor: theme.colors.gray[0], // Regular background color
+                      color: theme.black, // Regular icon color
+                      '&:hover': {
+                        backgroundColor: theme.colors.gray[2], // Hover background color
+                        color: theme.colors.blue[6], // Hover icon color
+                      }
+                    })}
+                  >
+                    <FaPlus size={20} style={{ color: 'inherit' }} />
+                  </ActionIcon>
+                </Tooltip>
               </div>
             </Grid.Col>
           </Grid>
-          <Recipe recipe={selectedRecipe} onRecipeSaved={() => setRecipeChangeTrigger(prev => !prev)} />
+          <Recipe
+            recipe={selectedRecipe}
+            onRecipeSaved={() => setRecipeChangeTrigger(prev => !prev)}
+            navbarWidth={navbarWidth}
+            navbarOpened={mobileOpened || desktopOpened}
+          />
         </Container>
       </AppShell.Main>
     </AppShell>

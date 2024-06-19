@@ -2,12 +2,13 @@
 
 ## Now
 
-- [ ] Add New Recipe button
-- [ ] Style Recipe action buttons
 - [ ] Style Recipe List
 - [ ] Style Delete Modal
 - [ ] Replace alerts with toasts
 - [ ] Make phone daddy happy
+- [ ] Use proper sign up/login
+    - [ ] Email confirmation
+    - [ ] Google authentication
 
 
 ## Later

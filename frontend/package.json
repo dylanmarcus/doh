@@ -15,9 +15,11 @@
     "@mantine/core": "^7.9.1",
     "@mantine/hooks": "^7.9.1",
     "@mantine/styles": "^6.0.21",
+    "@tabler/icons": "^3.6.0",
     "axios": "^1.7.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.2.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
