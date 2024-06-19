@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Text, Grid, Box, Title, Button, Modal } from '@mantine/core';
+import { TextInput, Text, Grid, Box, Title, Button, Modal, Tooltip } from '@mantine/core';
+import { FaClipboardList, FaSave, FaTrash } from 'react-icons/fa';
 import { createStyles } from '@mantine/styles';
 import IngredientSelector from './IngredientSelector';
 import axios from 'axios';
@@ -30,7 +31,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const Recipe = ({ recipe, onRecipeSaved }) => {
+const Recipe = ({ recipe, onRecipeSaved, navbarWidth }) => {
   const { classes } = useStyles();
 
   const [recipeName, setRecipeName] = useState(recipe ? recipe.name : '');
@@ -149,7 +150,6 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
   };
 
   const resetRecipe = () => {
-    console.log('Resetting recipe to default state');
     setRecipeName('');
     setNumberOfBalls(1);
     setBallWeight(500);
@@ -165,7 +165,7 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
   return (
     <Box>
       <Grid className={classes.recipeName}>
-        <Grid.Col span={12}>
+        <Grid.Col span={8}>
           <TextInput
             placeholder="Recipe Name"
             value={recipeName}
@@ -188,13 +188,27 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
         </Grid.Col>
       </Grid>
       <Grid>
-        <Grid.Col>
+        <Grid.Col span={12} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
           <div>
-            <Button onClick={handleSaveRecipe}>{recipe ? 'Update' : 'Save'}</Button>
-          </div>
-          <div>
+            <Tooltip
+              label="Save recipe"
+              position="right"
+              withArrow
+            >
+              <Button onClick={handleSaveRecipe} style={{ marginRight: '0.5rem', }}>
+                <FaSave size={20} />
+              </Button>
+            </Tooltip>
             {recipeId && (
-              <Button color="red" onClick={() => setDeleteDialogOpened(true)}>Delete</Button>
+              <Tooltip
+                label="Delete recipe"
+                position="right"
+                withArrow
+              >
+                <Button color="red" onClick={() => setDeleteDialogOpened(true)}>
+                  <FaTrash size={20} />
+                </Button>
+              </Tooltip>
             )}
           </div>
           <Modal
@@ -209,11 +223,25 @@ const Recipe = ({ recipe, onRecipeSaved }) => {
         </Grid.Col>
       </Grid>
       <Grid>
-        <Grid.Col>
-          <div>
-            <Button onClick={() => setSelectorOpen(true)}>Select Ingredients</Button>
-          </div>
-        </Grid.Col>
+        <Tooltip
+          label="Select ingredients"
+          position="right"
+          withArrow
+        >
+          <Button
+            onClick={() => setSelectorOpen(true)}
+            style={{
+              position: 'fixed',
+              left: `${navbarWidth + 30}px`,
+              top: 'calc(100% - 50px)',
+              transform: 'translateY(-50%)',
+              transition: 'left 200ms ease',
+              zIndex: 1000
+            }}
+          >
+            <FaClipboardList size={20} />
+          </Button>
+        </Tooltip>
       </Grid>
       <Grid className={classes.ingredientRow}>
         <Grid.Col span={12}>
