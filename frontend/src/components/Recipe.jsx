@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextInput, Group, Grid, Box, Title, Button, Modal, Tooltip } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { FaClipboardList, FaSave, FaTrash } from 'react-icons/fa';
 import { createStyles } from '@mantine/styles';
 import IngredientSelector from './IngredientSelector';
@@ -110,7 +111,22 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
     setIngredientPercentages(newPercentages);
   };
 
+  const showMessage = (message, color) => {
+    notifications.show({
+      title: message,
+      color: color,
+    });
+  }
+
   const handleSaveRecipe = async () => {
+    if (!recipeName) {
+      notifications.show({
+        title: 'This recipe deserves a name...',
+        message: 'Give it a name and try again.',
+        color: 'orange',
+      });
+      return;
+    }
     const recipeData = {
       name: recipeName,
       ingredients: selectedIngredients.map((selected, index) => ({
@@ -129,10 +145,15 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
       const response = await axios[method](url, recipeData);
       if (!recipeId) setRecipeId(response.data._id);
       onRecipeSaved(response.data);
-      alert('Recipe saved successfully!');
+      showMessage('Recipe saved!', 'green');
     } catch (error) {
-      console.error('Failed to save recipe:', error);
-      alert('Failed to save recipe');
+      if (error.response && error.response.status === 401) {
+        console.error('Unauthorized access:', error);
+        showMessage('Recipe not saved. Login or Sign Up to save this recipe', 'blue');
+      } else {
+        console.error('Failed to save recipe:', error);
+        showMessage('Failed to save recipe', 'red');
+      }
     }
   };
 
@@ -141,12 +162,12 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
       await axios.delete(`/api/recipes/${recipeId}`);
       onRecipeSaved(); // Trigger a refresh or redirect after deletion
       resetRecipe();
-      alert('Recipe deleted successfully!');
+      showMessage('Recipe deleted.', 'green');
     } catch (error) {
       console.error('Failed to delete recipe:', error);
-      alert('Failed to delete recipe');
+      showMessage('Failed to delete recipe', 'red');
     }
-    setDeleteDialogOpened(false); // Close the confirmation dialog
+    setDeleteDialogOpened(false);
   };
 
   const resetRecipe = () => {
