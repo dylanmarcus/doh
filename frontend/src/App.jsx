@@ -127,6 +127,11 @@ const App = () => {
             {recipe.name}
           </a>
         ))}
+        {!recipes.length && (
+          <div style={{ fontSize: rem(16), textAlign: 'center', marginTop: '1rem' }}>
+            mmmmmmmmmm... saaaaved recccccipeeeeeesss...
+          </div>
+        )}
       </AppShell.Navbar>
       <AppShell.Main>
         <Container padding="md" size="xl" style={{ maxWidth: '100%' }}>
