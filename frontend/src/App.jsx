@@ -99,7 +99,7 @@ const App = () => {
               <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
             </span>
           </Tooltip>
-          <img src={logo} alt="Logo" style={{ height: '50px' }} />
+          <img src={logo} alt="Logo" style={{ height: '3rem' }} />
           <Title order={1} style={{ flexGrow: 1 }}>Doh</Title>
           <Group>
             {!isAuthenticated && (
