@@ -173,7 +173,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
             onFocus={(event) => event.target.select()}
             styles={{
               input: {
-                fontSize: '2.5rem',
+                fontSize: '2rem',
                 fontWeight: 'bold',
                 lineHeight: '6rem',
                 padding: '0',
