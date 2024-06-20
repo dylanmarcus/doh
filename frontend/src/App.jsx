@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AppShell, Burger, Grid, Group, Container, Title, Button, ActionIcon, Tooltip } from '@mantine/core';
+import { AppShell, Burger, Grid, Group, Container, Title, Button, ActionIcon, Tooltip, rem } from '@mantine/core';
 import { FaPlus } from 'react-icons/fa';
 import { useDisclosure } from '@mantine/hooks';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import logo from '../src/assets/donut.png';
 import Recipe from './components/Recipe';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
+import classes from '../styles/RecipeList.module.css';
 
 const App = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -116,10 +117,21 @@ const App = () => {
       </AppShell.Header>
       <AppShell.Navbar ref={navbarRef} p='md'>
         {recipes.map(recipe => (
-          <Button key={recipe._id} onClick={() => selectRecipe(recipe._id)}>
+          <a
+            href="#"
+            key={recipe._id}
+            onClick={() => selectRecipe(recipe._id)}
+            className={classes.recipeLink}
+            style={{ fontSize: rem(16) }}
+          >
             {recipe.name}
-          </Button>
+          </a>
         ))}
+        {!recipes.length && (
+          <div style={{ fontSize: rem(16), textAlign: 'center', marginTop: '1rem' }}>
+            mmmmmmmmmm... saaaaved recccccipeeeeeesss...
+          </div>
+        )}
       </AppShell.Navbar>
       <AppShell.Main>
         <Container padding="md" size="xl" style={{ maxWidth: '100%' }}>

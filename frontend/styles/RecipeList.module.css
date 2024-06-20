@@ -1,0 +1,22 @@
+.recipeLink {
+  display: block;
+  padding: var(--mantine-spacing-md);
+  text-decoration: none;
+  border-radius: var(--mantine-radius-sm);
+  font-size: var(--mantine-font-size-xs);
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+  line-height: 1;
+  font-weight: 500;
+  margin-left: calc(var(--mantine-spacing-md));
+  margin-right: calc(var(--mantine-spacing-xs));
+  margin-bottom: var(--mantine-spacing-md);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+
+  &:hover {
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+    color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+  }
+}
