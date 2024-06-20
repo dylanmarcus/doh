@@ -254,7 +254,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
             onClick={() => setSelectorOpen(true)}
             style={{
               position: 'fixed',
-              left: navbarOpened && window.innerWidth > 768 ? `${navbarWidth + 1}rem` : '1rem',
+              left: navbarOpened && window.innerWidth > 768 ? rem(navbarWidth + 15) : rem(15),
               top: 'calc(100% - 2rem)',
               transform: 'translateY(-50%)',
               transition: 'left 200ms ease',
