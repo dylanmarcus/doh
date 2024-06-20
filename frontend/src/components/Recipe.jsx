@@ -258,7 +258,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
               top: 'calc(100% - 2rem)',
               transform: 'translateY(-50%)',
               transition: 'left 200ms ease',
-              zIndex: 1000
+              zIndex: 99
             }}
           >
             <FaClipboardList size={20} />
