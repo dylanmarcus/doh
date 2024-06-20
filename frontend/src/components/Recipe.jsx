@@ -192,7 +192,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
           <div>
             <Tooltip
               label="Save recipe"
-              position="right"
+              position="bottom"
               withArrow
             >
               <Button onClick={handleSaveRecipe} style={{ marginRight: '0.5rem', }}>
@@ -202,7 +202,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
             {recipeId && (
               <Tooltip
                 label="Delete recipe"
-                position="right"
+                position="bottom"
                 withArrow
               >
                 <Button color="red" onClick={() => setDeleteDialogOpened(true)}>

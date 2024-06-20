@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] Style Recipe List
 - [ ] Style Delete Modal
 - [ ] Replace alerts with toasts
 - [ ] Make phone daddy happy
