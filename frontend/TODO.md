@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] Style Delete Modal
 - [ ] Replace alerts with toasts
 - [ ] Make phone daddy happy
 - [ ] Use proper sign up/login
