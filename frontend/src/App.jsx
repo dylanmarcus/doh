@@ -77,6 +77,7 @@ const App = () => {
 
   return (
     <AppShell
+      style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
       header={{ height: { base: 60, md: 70, lg: 80 } }}
       navbar={{
         width: { base: 200, md: 300, lg: 400 },
@@ -115,7 +116,7 @@ const App = () => {
           <SignUp opened={signUpOpened} onClose={() => setSignUpOpened(false)} onSignUpSuccess={handleLogin} />
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar ref={navbarRef} p='md'>
+      <AppShell.Navbar ref={navbarRef} p='md' style={{ flexGrow: 1, overflowY: 'auto' }}>
         {recipes.map(recipe => (
           <a
             key={recipe._id}
