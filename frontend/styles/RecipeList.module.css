@@ -1,6 +1,7 @@
 .recipeLink {
   display: block;
-  padding: var(--mantine-spacing-md);
+  padding: 1rem;
+  padding-bottom: 2rem;
   text-decoration: none;
   border-radius: var(--mantine-radius-sm);
   font-size: var(--mantine-font-size-xs);
@@ -9,7 +10,7 @@
   font-weight: 500;
   margin-left: calc(var(--mantine-spacing-md));
   margin-right: calc(var(--mantine-spacing-xs));
-  margin-bottom: var(--mantine-spacing-md);
+  margin-bottom: var(--mantine-spacing-xs);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -18,5 +19,6 @@
   &:hover {
     background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
     color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+    cursor: pointer;
   }
 }

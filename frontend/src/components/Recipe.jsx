@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Group, Grid, Box, Title, Button, Modal, Tooltip } from '@mantine/core';
+import { TextInput, Group, Grid, Box, Title, Button, Modal, Tooltip, rem } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { FaClipboardList, FaSave, FaTrash } from 'react-icons/fa';
 import { createStyles } from '@mantine/styles';
@@ -254,11 +254,11 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
             onClick={() => setSelectorOpen(true)}
             style={{
               position: 'fixed',
-              left: navbarOpened && window.innerWidth > 768 ? `${navbarWidth + 32}px` : '32px',
-              top: 'calc(100% - 50px)',
+              left: navbarOpened && window.innerWidth > 768 ? rem(navbarWidth + 15) : rem(15),
+              top: 'calc(100% - 2rem)',
               transform: 'translateY(-50%)',
               transition: 'left 200ms ease',
-              zIndex: 1000
+              zIndex: 99
             }}
           >
             <FaClipboardList size={20} />

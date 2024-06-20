@@ -71,6 +71,9 @@ const App = () => {
     axios.get(`/api/recipes/${id}`)
       .then(response => {
         setSelectedRecipe(response.data);
+        if (mobileOpened) {
+          toggleMobile();
+        }
       })
       .catch(error => console.error('Failed to fetch recipe details:', error));
   };
@@ -99,7 +102,7 @@ const App = () => {
               <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
             </span>
           </Tooltip>
-          <img src={logo} alt="Logo" style={{ height: '50px' }} />
+          <img src={logo} alt="Logo" style={{ height: rem(50) }} />
           <Title order={1} style={{ flexGrow: 1 }}>Doh</Title>
           <Group>
             {!isAuthenticated && (
