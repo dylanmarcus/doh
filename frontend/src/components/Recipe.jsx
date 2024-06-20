@@ -111,14 +111,22 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
     setIngredientPercentages(newPercentages);
   };
 
-  const showMessage = (title, color) => {
+  const showMessage = (message, color) => {
     notifications.show({
-      title: title,
+      title: message,
       color: color,
     });
   }
 
   const handleSaveRecipe = async () => {
+    if (!recipeName) {
+      notifications.show({
+        title: 'This recipe deserves a name...',
+        message: 'Give it a name and try again.',
+        color: 'orange',
+      });
+      return;
+    }
     const recipeData = {
       name: recipeName,
       ingredients: selectedIngredients.map((selected, index) => ({
@@ -139,8 +147,13 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
       onRecipeSaved(response.data);
       showMessage('Recipe saved!', 'green');
     } catch (error) {
-      console.error('Failed to save recipe:', error);
-      showMessage('Failed to save recipe', 'red');
+      if (error.response && error.response.status === 401) {
+        console.error('Unauthorized access:', error);
+        showMessage('Recipe not saved. Login or Sign Up to save this recipe', 'blue');
+      } else {
+        console.error('Failed to save recipe:', error);
+        showMessage('Failed to save recipe', 'red');
+      }
     }
   };
 
