@@ -118,7 +118,6 @@ const App = () => {
       <AppShell.Navbar ref={navbarRef} p='md'>
         {recipes.map(recipe => (
           <a
-            href="#"
             key={recipe._id}
             onClick={() => selectRecipe(recipe._id)}
             className={classes.recipeLink}
@@ -148,11 +147,11 @@ const App = () => {
                     size="xl"
                     onClick={() => setSelectedRecipe(null)}
                     sx={(theme) => ({
-                      backgroundColor: theme.colors.gray[0], // Regular background color
-                      color: theme.black, // Regular icon color
+                      backgroundColor: theme.colors.gray[0],
+                      color: theme.black,
                       '&:hover': {
-                        backgroundColor: theme.colors.gray[2], // Hover background color
-                        color: theme.colors.blue[6], // Hover icon color
+                        backgroundColor: theme.colors.gray[2],
+                        color: theme.colors.blue[6],
                       }
                     })}
                   >
@@ -164,7 +163,10 @@ const App = () => {
           </Grid>
           <Recipe
             recipe={selectedRecipe}
-            onRecipeSaved={() => setRecipeChangeTrigger(prev => !prev)}
+            onRecipeSaved={(savedRecipe) => {
+              setRecipeChangeTrigger(prev => !prev);
+              setSelectedRecipe(savedRecipe);
+            }}
             navbarWidth={navbarWidth}
             navbarOpened={mobileOpened || desktopOpened}
           />

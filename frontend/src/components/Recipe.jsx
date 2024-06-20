@@ -75,8 +75,8 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
       setRecipeName(recipe.name);
       setNumberOfBalls(recipe.numberOfBalls);
       setBallWeight(recipe.ballWeight);
-      setIngredientPercentages(recipe.ingredients.map(ing => ing.percentage));
-      setSelectedIngredients(recipe.ingredients.map(ing => ing.selected));
+      setIngredientPercentages(recipe.ingredients.map(ingredient => ingredient.percentage));
+      setSelectedIngredients(recipe.ingredients.map(ingredient => ingredient.selected));
     }
   }, [recipe]);
 
@@ -128,7 +128,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
     try {
       const response = await axios[method](url, recipeData);
       if (!recipeId) setRecipeId(response.data._id);
-      onRecipeSaved();
+      onRecipeSaved(response.data);
       alert('Recipe saved successfully!');
     } catch (error) {
       console.error('Failed to save recipe:', error);
