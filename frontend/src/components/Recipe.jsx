@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, Text, Grid, Box, Title, Button, Modal, Tooltip } from '@mantine/core';
+import { TextInput, Group, Grid, Box, Title, Button, Modal, Tooltip } from '@mantine/core';
 import { FaClipboardList, FaSave, FaTrash } from 'react-icons/fa';
 import { createStyles } from '@mantine/styles';
 import IngredientSelector from './IngredientSelector';
@@ -214,11 +214,12 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
           <Modal
             opened={deleteDialogOpened}
             onClose={() => setDeleteDialogOpened(false)}
-            title="Confirm Deletion"
+            title="Are you sure you want to delete this recipe?"
           >
-            <Text>Are you sure you want to delete this recipe?</Text>
-            <Button color="red" onClick={handleDeleteRecipe}>Yes</Button>
-            <Button onClick={() => setDeleteDialogOpened(false)}>No</Button>
+            <Group position="apart" style={{ marginTop: '1rem' }}>
+              <Button color="red" onClick={handleDeleteRecipe}>Delete</Button>
+              <Button onClick={() => setDeleteDialogOpened(false)}>Keep</Button>
+            </Group>
           </Modal>
         </Grid.Col>
       </Grid>
