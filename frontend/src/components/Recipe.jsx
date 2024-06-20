@@ -232,7 +232,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
             onClick={() => setSelectorOpen(true)}
             style={{
               position: 'fixed',
-              left: navbarOpened && window.innerWidth > 768 ? `${navbarWidth + 30}px` : '30px',
+              left: navbarOpened && window.innerWidth > 768 ? `${navbarWidth + 32}px` : '32px',
               top: 'calc(100% - 50px)',
               transform: 'translateY(-50%)',
               transition: 'left 200ms ease',
