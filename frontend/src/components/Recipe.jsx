@@ -42,7 +42,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       numberOfBalls: recipe ? recipe.numberOfBalls : 1,
       ballWeight: recipe ? recipe.ballWeight : 500,
       ingredientPercentages: recipe ? recipe.ingredients.map(ing => ing.percentage) : [],
-      selectedIngredients: recipe ? recipe.ingredients.map(ing => ing.selected) : []
+      selectedIngredients: recipe ? recipe.ingredients.map(ing => ing.selected) : [],
     };
   });
 
@@ -73,7 +73,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
         setRecipeState(prevState => ({
           ...prevState,
           ingredientPercentages: prevState.ingredientPercentages && prevState.ingredientPercentages.length > 0 ? prevState.ingredientPercentages : data.map(ingredient => ingredient.defaultPercentage),
-          selectedIngredients: defaultSelectedIngredients
+          selectedIngredients: defaultSelectedIngredients,
         }));
       });
   }, []);
@@ -98,7 +98,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
         numberOfBalls: recipe.numberOfBalls,
         ballWeight: recipe.ballWeight,
         ingredientPercentages: recipe.ingredients.map(ingredient => ingredient.percentage),
-        selectedIngredients: recipe.ingredients.map(ingredient => ingredient.selected)
+        selectedIngredients: recipe.ingredients.map(ingredient => ingredient.selected),
       });
     }
   }, [recipe]);
@@ -115,22 +115,12 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     setTimeout(() => event.target.select(), 10);
   };
 
-  const handleNumberOfBallsChange = (event) => {
-    const value = parseInt(event.target.value) || 0;
-    setNumberOfBalls(value);
-  };
-
-  const handleBallWeightChange = (event) => {
-    const value = parseInt(event.target.value) || 0;
-    setBallWeight(value);
-  };
-
   const handlePercentageChange = (index, value) => {
     const newPercentages = [...recipeState.ingredientPercentages];
     newPercentages[index] = parseFloat(value) || 0;
     setRecipeState(prevState => ({
       ...prevState,
-      ingredientPercentages: newPercentages
+      ingredientPercentages: newPercentages,
     }));
   };
 
@@ -152,13 +142,13 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     }
     const recipeData = {
       name: recipeState.name,
-      ingredients: selectedIngredients.map((selected, index) => ({
+      ingredients: recipeState.selectedIngredients.map((selected, index) => ({
         label: ingredients[index].label,
         percentage: recipeState.ingredientPercentages[index],
         selected
       })),
-      numberOfBalls,
-      ballWeight
+      numberOfBalls: recipeState.numberOfBalls,
+      ballWeight: recipeState.ballWeight,
     };
 
     const url = recipeId ? `/api/recipes/${recipeId}` : '/api/recipes/';
@@ -202,8 +192,8 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
           name: '',
           numberOfBalls: 1,
           ballWeight: 500,
-          ingredientPercentages: [],
-          selectedIngredients: defaultSelectedIngredients
+          ingredientPercentages: data.map(ingredient => ingredient.defaultPercentage),
+          selectedIngredients: defaultSelectedIngredients,
         });
       });
     sessionStorage.removeItem('recipe');
@@ -288,7 +278,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
               top: 'calc(100% - 2rem)',
               transform: 'translateY(-50%)',
               transition: 'left 200ms ease',
-              zIndex: 99
+              zIndex: 99,
             }}
           >
             <FaClipboardList size={20} />
