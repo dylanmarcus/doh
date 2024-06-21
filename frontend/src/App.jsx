@@ -20,6 +20,7 @@ const App = () => {
   const [recipeChangeTrigger, setRecipeChangeTrigger] = useState(false);
   const navbarRef = useRef(null);
   const [navbarWidth, setNavbarWidth] = useState(0);
+  const [userInitiatedReset, setUserInitiatedReset] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -147,7 +148,10 @@ const App = () => {
                   <ActionIcon
                     variant="filled"
                     size="xl"
-                    onClick={() => setSelectedRecipe(null)}
+                    onClick={() => {
+                      setSelectedRecipe(null);
+                      setUserInitiatedReset(true);
+                    }}
                     sx={(theme) => ({
                       backgroundColor: theme.colors.gray[0],
                       color: theme.black,
@@ -169,6 +173,8 @@ const App = () => {
               setRecipeChangeTrigger(prev => !prev);
               setSelectedRecipe(savedRecipe);
             }}
+            userInitiatedReset={userInitiatedReset}
+            setUserInitiatedReset={setUserInitiatedReset}
             navbarWidth={navbarWidth}
             navbarOpened={mobileOpened || desktopOpened}
           />
