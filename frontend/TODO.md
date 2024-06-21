@@ -2,7 +2,6 @@
 
 ## Now
 
-- [ ] Reset percentages after new recipe click
 - [ ] Use proper sign up/login
     - [ ] Email confirmation
     - [ ] Google authentication

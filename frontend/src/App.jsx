@@ -22,6 +22,10 @@ const App = () => {
   const [navbarWidth, setNavbarWidth] = useState(0);
   const [userInitiatedReset, setUserInitiatedReset] = useState(false);
 
+  /**
+   * Checks if a token exists in local storage and sets the authentication state accordingly.
+   * This effect is run once on component mount to initialize the authentication state.
+   */
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {

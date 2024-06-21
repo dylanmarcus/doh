@@ -45,14 +45,15 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       selectedIngredients: recipe ? recipe.ingredients.map(ing => ing.selected) : [],
     };
   });
-
+  
+  const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
   const [ingredients, setIngredients] = useState([]);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [recipeId, setRecipeId] = useState(recipe ? recipe._id : null);
   const [deleteDialogOpened, setDeleteDialogOpened] = useState(false);
 
-  const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
 
+  // Resets the recipe state if there is no recipe and the user has initiated a reset.
   useEffect(() => {
     if (!recipe && userInitiatedReset) {
       resetRecipe();
@@ -60,10 +61,18 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     }
   }, [recipe, userInitiatedReset]);
 
+  /**
+   * Saves the current recipe state to the browser's session storage.
+   * This ensures the recipe state is persisted across page refreshes or navigation.
+   */
   useEffect(() => {
     sessionStorage.setItem('recipe', JSON.stringify(recipeState));
   }, [recipeState]);
 
+  /**
+   * Fetches ingredient data from a JSON file and initializes the recipe state with the default ingredient percentages and selected ingredients.
+   * This effect is called once when the component is mounted, and it ensures the recipe state is properly initialized with the ingredient data.
+   */
   useEffect(() => {
     fetch('src/utils/ingredients.json')
       .then(response => response.json())
@@ -72,16 +81,24 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
         const defaultSelectedIngredients = data.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true);
         setRecipeState(prevState => ({
           ...prevState,
-          ingredientPercentages: prevState.ingredientPercentages && prevState.ingredientPercentages.length > 0 ? prevState.ingredientPercentages : data.map(ingredient => ingredient.defaultPercentage),
+          ingredientPercentages: prevState.ingredientPercentages &&
+            prevState.ingredientPercentages.length > 0 ?
+            prevState.ingredientPercentages :
+            data.map(ingredient => ingredient.defaultPercentage),
+
           selectedIngredients: defaultSelectedIngredients,
         }));
       });
   }, []);
 
+  /**
+   * Calculates the base ingredient weight based on the total dough mass and the selected ingredient percentages.
+   * This function is called whenever the recipe state changes.
+   */
   useEffect(() => {
     const updateBaseIngredientWeight = () => {
       const totalDoughMass = recipeState.numberOfBalls * recipeState.ballWeight;
-      const selectedPercentages = recipeState.ingredientPercentages?.filter((_, index) => 
+      const selectedPercentages = recipeState.ingredientPercentages?.filter((_, index) =>
         recipeState.selectedIngredients[index] && !(ingredients[index]?.isBaseIngredient)
       ) || [];
       const percentageSum = selectedPercentages.reduce((sum, percentage) => sum + percentage, 0);
@@ -91,6 +108,11 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     updateBaseIngredientWeight();
   }, [recipeState.numberOfBalls, recipeState.ballWeight, recipeState.ingredientPercentages, recipeState.selectedIngredients, ingredients]);
 
+  /**
+   * Initializes the recipe state with the data from the provided `recipe` object.
+   * This effect is called whenever the `recipe` prop changes, and it ensures the
+   * recipe state is properly updated with the new recipe data.
+   */
   useEffect(() => {
     if (recipe) {
       setRecipeState({
@@ -103,16 +125,17 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     }
   }, [recipe]);
 
+  /**
+   * Initializes the `recipeId` state with the `_id` of the provided `recipe` object, or sets it to `null` if no `recipe` is provided.
+   * This effect is called whenever the `recipe` prop changes, and it ensures the `recipeId` state is properly updated with the new recipe data.
+   */
   useEffect(() => {
     setRecipeId(recipe ? recipe._id : null);
   }, [recipe]);
 
+   // Handles changes to the recipe state by updating the specified field with the provided value.
   const handleInputChange = (field, value) => {
     setRecipeState(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleInputFocus = (event) => {
-    setTimeout(() => event.target.select(), 10);
   };
 
   const handlePercentageChange = (index, value) => {
@@ -122,6 +145,10 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       ...prevState,
       ingredientPercentages: newPercentages,
     }));
+  };
+
+  const handleInputFocus = (event) => {
+    setTimeout(() => event.target.select(), 10);
   };
 
   const showMessage = (message, color) => {
