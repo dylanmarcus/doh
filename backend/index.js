@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -8,11 +7,19 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const cors = require('cors');
-app.use(cors({
-  origin: 'http://localhost:5173'
-}));
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' ? 'https://doh-app-446575e57f3f.herokuapp.com' : 'http://localhost:5173',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
 
-// Connect to MongoDB
+const helmet = require('helmet');
+app.use(helmet());
+
+const compression = require('compression');
+app.use(compression());
+
+const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
