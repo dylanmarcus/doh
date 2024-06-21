@@ -71,9 +71,7 @@ const App = () => {
     axios.get(`/api/recipes/${id}`)
       .then(response => {
         setSelectedRecipe(response.data);
-        if (mobileOpened) {
-          toggleMobile();
-        }
+        if (mobileOpened) toggleMobile();
       })
       .catch(error => console.error('Failed to fetch recipe details:', error));
   };
