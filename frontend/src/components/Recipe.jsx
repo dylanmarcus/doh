@@ -32,14 +32,20 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
+const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiatedReset, setUserInitiatedReset }) => {
   const { classes } = useStyles();
 
-  const [recipeName, setRecipeName] = useState(recipe ? recipe.name : '');
-  const [numberOfBalls, setNumberOfBalls] = useState(recipe ? recipe.numberOfBalls : 1);
-  const [ballWeight, setBallWeight] = useState(recipe ? recipe.ballWeight : 500);
-  const [ingredientPercentages, setIngredientPercentages] = useState(recipe ? recipe.ingredients.map(ing => ing.percentage) : []);
-  const [selectedIngredients, setSelectedIngredients] = useState(recipe ? recipe.ingredients.map(ing => ing.selected) : []);
+  const [recipeState, setRecipeState] = useState(() => {
+    const sessionRecipe = sessionStorage.getItem('recipe');
+    return sessionRecipe ? JSON.parse(sessionRecipe) : {
+      name: recipe ? recipe.name : '',
+      numberOfBalls: recipe ? recipe.numberOfBalls : 1,
+      ballWeight: recipe ? recipe.ballWeight : 500,
+      ingredientPercentages: recipe ? recipe.ingredients.map(ing => ing.percentage) : [],
+      selectedIngredients: recipe ? recipe.ingredients.map(ing => ing.selected) : []
+    };
+  });
+
   const [ingredients, setIngredients] = useState([]);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [recipeId, setRecipeId] = useState(recipe ? recipe._id : null);
@@ -48,36 +54,52 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
   const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
 
   useEffect(() => {
+    if (!recipe && userInitiatedReset) {
+      resetRecipe();
+      setUserInitiatedReset(false); // Reset the flag
+    }
+  }, [recipe, userInitiatedReset]);
+
+  useEffect(() => {
+    sessionStorage.setItem('recipe', JSON.stringify(recipeState));
+  }, [recipeState]);
+
+  useEffect(() => {
     fetch('src/utils/ingredients.json')
       .then(response => response.json())
       .then(data => {
         setIngredients(data);
-        setIngredientPercentages(data.map(ingredient => ingredient.defaultPercentage));
-
-        // Initialize selected ingredients based on default ingredients
         const defaultSelectedIngredients = data.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true);
-        setSelectedIngredients(defaultSelectedIngredients);
+        setRecipeState(prevState => ({
+          ...prevState,
+          ingredientPercentages: prevState.ingredientPercentages && prevState.ingredientPercentages.length > 0 ? prevState.ingredientPercentages : data.map(ingredient => ingredient.defaultPercentage),
+          selectedIngredients: defaultSelectedIngredients
+        }));
       });
   }, []);
 
   useEffect(() => {
     const updateBaseIngredientWeight = () => {
-      const totalDoughMass = numberOfBalls * ballWeight;
-      const selectedPercentages = ingredientPercentages.filter((_, index) => selectedIngredients[index] && !ingredients[index].isBaseIngredient);
+      const totalDoughMass = recipeState.numberOfBalls * recipeState.ballWeight;
+      const selectedPercentages = recipeState.ingredientPercentages?.filter((_, index) => 
+        recipeState.selectedIngredients[index] && !(ingredients[index]?.isBaseIngredient)
+      ) || [];
       const percentageSum = selectedPercentages.reduce((sum, percentage) => sum + percentage, 0);
       setBaseIngredientWeight(totalDoughMass / (1 + percentageSum / 100));
     };
 
     updateBaseIngredientWeight();
-  }, [numberOfBalls, ballWeight, ingredientPercentages, selectedIngredients, ingredients]);
+  }, [recipeState.numberOfBalls, recipeState.ballWeight, recipeState.ingredientPercentages, recipeState.selectedIngredients, ingredients]);
 
   useEffect(() => {
     if (recipe) {
-      setRecipeName(recipe.name);
-      setNumberOfBalls(recipe.numberOfBalls);
-      setBallWeight(recipe.ballWeight);
-      setIngredientPercentages(recipe.ingredients.map(ingredient => ingredient.percentage));
-      setSelectedIngredients(recipe.ingredients.map(ingredient => ingredient.selected));
+      setRecipeState({
+        name: recipe.name,
+        numberOfBalls: recipe.numberOfBalls,
+        ballWeight: recipe.ballWeight,
+        ingredientPercentages: recipe.ingredients.map(ingredient => ingredient.percentage),
+        selectedIngredients: recipe.ingredients.map(ingredient => ingredient.selected)
+      });
     }
   }, [recipe]);
 
@@ -85,11 +107,9 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
     setRecipeId(recipe ? recipe._id : null);
   }, [recipe]);
 
-  useEffect(() => {
-    if (!recipe) {
-      resetRecipe();
-    }
-  }, [recipe]);
+  const handleInputChange = (field, value) => {
+    setRecipeState(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleInputFocus = (event) => {
     setTimeout(() => event.target.select(), 10);
@@ -106,9 +126,12 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
   };
 
   const handlePercentageChange = (index, value) => {
-    const newPercentages = [...ingredientPercentages];
+    const newPercentages = [...recipeState.ingredientPercentages];
     newPercentages[index] = parseFloat(value) || 0;
-    setIngredientPercentages(newPercentages);
+    setRecipeState(prevState => ({
+      ...prevState,
+      ingredientPercentages: newPercentages
+    }));
   };
 
   const showMessage = (message, color) => {
@@ -119,7 +142,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
   }
 
   const handleSaveRecipe = async () => {
-    if (!recipeName) {
+    if (!recipeState.name) {
       notifications.show({
         title: 'This recipe deserves a name...',
         message: 'Give it a name and try again.',
@@ -128,10 +151,10 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
       return;
     }
     const recipeData = {
-      name: recipeName,
+      name: recipeState.name,
       ingredients: selectedIngredients.map((selected, index) => ({
         label: ingredients[index].label,
-        percentage: ingredientPercentages[index],
+        percentage: recipeState.ingredientPercentages[index],
         selected
       })),
       numberOfBalls,
@@ -171,12 +194,19 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
   };
 
   const resetRecipe = () => {
-    setRecipeName('');
-    setNumberOfBalls(1);
-    setBallWeight(500);
-    setIngredientPercentages(ingredients.map(ingredient => ingredient.defaultPercentage));
-    setSelectedIngredients(ingredients.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true));
-    setRecipeId(null);
+    fetch('src/utils/ingredients.json')
+      .then(response => response.json())
+      .then(data => {
+        const defaultSelectedIngredients = data.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true);
+        setRecipeState({
+          name: '',
+          numberOfBalls: 1,
+          ballWeight: 500,
+          ingredientPercentages: [],
+          selectedIngredients: defaultSelectedIngredients
+        });
+      });
+    sessionStorage.removeItem('recipe');
   };
 
   const percentageToGrams = (bakerPercentage, baseIngredient) => {
@@ -189,8 +219,8 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
         <Grid.Col span={8}>
           <TextInput
             placeholder="Recipe Name"
-            value={recipeName}
-            onChange={(event) => setRecipeName(event.target.value)}
+            value={recipeState.name}
+            onChange={(event) => handleInputChange('name', event.target.value)}
             onFocus={(event) => event.target.select()}
             styles={{
               input: {
@@ -267,8 +297,11 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
       </Grid>
       <Modal opened={selectorOpen} onClose={() => setSelectorOpen(false)} title="Select Ingredients">
         <IngredientSelector
-          selectedIngredients={selectedIngredients}
-          setSelectedIngredients={setSelectedIngredients}
+          selectedIngredients={recipeState.selectedIngredients}
+          setSelectedIngredients={(newSelectedIngredients) => setRecipeState(prevState => ({
+            ...prevState,
+            selectedIngredients: newSelectedIngredients
+          }))}
           onClose={() => setSelectorOpen(false)}
         />
       </Modal>
@@ -282,8 +315,8 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
               classNames={{ input: classes.input }}
               styles={{ input: { textAlign: 'center' } }}
               placeholder="Number of balls"
-              value={numberOfBalls}
-              onChange={handleNumberOfBallsChange}
+              value={recipeState.numberOfBalls}
+              onChange={(event) => handleInputChange('numberOfBalls', event.target.value)}
               onFocus={handleInputFocus}
             />
           </div>
@@ -299,15 +332,15 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
               classNames={{ input: classes.input }}
               styles={{ input: { textAlign: 'center' } }}
               placeholder="Ball weight"
-              value={ballWeight}
-              onChange={handleBallWeightChange}
+              value={recipeState.ballWeight}
+              onChange={(event) => handleInputChange('ballWeight', event.target.value)}
               onFocus={handleInputFocus}
             />
           </div>
         </Grid.Col>
       </Grid>
       {ingredients.map((ingredient, index) => (
-        selectedIngredients[index] && (
+        recipeState.selectedIngredients[index] && (
           <Grid key={ingredient.name} className={classes.ingredientRow}>
             <Grid.Col span={12}>
               <Title order={5} className={classes.ingredientName}>{ingredient.label}</Title>
@@ -319,7 +352,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
                   styles={{ input: { textAlign: 'right' } }}
                   placeholder={ingredient.isBaseIngredient ? 'Total baseIngredient weight' : 'Baker\'s percentage'}
                   rightSection={<span>{ingredient.isBaseIngredient ? 'g' : '%'}</span>}
-                  value={ingredient.isBaseIngredient ? baseIngredientWeight.toFixed(2) : ingredientPercentages[index]}
+                  value={ingredient.isBaseIngredient ? baseIngredientWeight.toFixed(2) : recipeState.ingredientPercentages[index]}
                   onFocus={handleInputFocus}
                   onChange={(event) => {
                     if (!ingredient.isBaseIngredient) {
@@ -333,7 +366,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened }) => {
                     classNames={{ input: classes.input }}
                     styles={{ input: { textAlign: 'right' } }}
                     readOnly
-                    value={percentageToGrams(ingredientPercentages[index], baseIngredientWeight).toFixed(2)}
+                    value={percentageToGrams(recipeState.ingredientPercentages[index], baseIngredientWeight).toFixed(2)}
                     rightSection={<span>g</span>}
                   />
                 ) : null}
