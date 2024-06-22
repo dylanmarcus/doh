@@ -5,7 +5,6 @@ import { FaClipboardList, FaSave, FaTrash } from 'react-icons/fa';
 import { createStyles } from '@mantine/styles';
 import IngredientSelector from './IngredientSelector';
 import axios from 'axios';
-import ingredientsJSON from '../utils/ingredients.json';
 
 const useStyles = createStyles((theme) => ({
   recipeName: {
@@ -33,10 +32,75 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
+const defaultIngredients = [
+  {
+    name: "flour",
+    label: "Flour",
+    unit: "g",
+    isBaseIngredient: true,
+    defaultPercentage: 0,
+    defaultSelected: true
+  },
+  {
+    name: "water",
+    label: "Water",
+    unit: "g",
+    isBaseIngredient: false,
+    defaultPercentage: 60,
+    defaultSelected: true
+  },
+  {
+    name: "salt",
+    label: "Salt",
+    unit: "g",
+    isBaseIngredient: false,
+    defaultPercentage: 2,
+    defaultSelected: true
+  },
+  {
+    name: "yeast",
+    label: "Yeast",
+    unit: "g",
+    isBaseIngredient: false,
+    defaultPercentage: 1,
+    defaultSelected: true
+  },
+  {
+    name: "fat",
+    label: "Fat",
+    unit: "g",
+    isBaseIngredient: false,
+    defaultPercentage: 10,
+    defaultSelected: true
+  },
+  {
+    name: "sugar",
+    label: "Sugar",
+    unit: "g",
+    isBaseIngredient: false,
+    defaultPercentage: 5,
+    defaultSelected: false
+  },
+  {
+    name: "bakingSoda",
+    label: "Baking Soda",
+    unit: "g",
+    isBaseIngredient: false,
+    defaultPercentage: 1,
+    defaultSelected: false
+  },
+  {
+    name: "bakingPowder",
+    label: "Baking Powder",
+    unit: "g",
+    isBaseIngredient: false,
+    defaultPercentage: 2,
+    defaultSelected: false
+  }
+];
+
 const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiatedReset, setUserInitiatedReset }) => {
   const { classes } = useStyles();
-
-  const defaultSelectedIngredients = ingredientsJSON.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true);
 
   const [recipeState, setRecipeState] = useState(() => {
     const sessionRecipe = sessionStorage.getItem('recipe');
@@ -44,13 +108,13 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       name: recipe ? recipe.name : '',
       numberOfBalls: recipe ? recipe.numberOfBalls : 1,
       ballWeight: recipe ? recipe.ballWeight : 500,
-      ingredientPercentages: ingredientsJSON.map(ingredient => ingredient.defaultPercentage),
-      selectedIngredients: defaultSelectedIngredients,
+      ingredientPercentages: defaultIngredients.map(ingredient => ingredient.defaultPercentage),
+      selectedIngredients: defaultIngredients.map(ingredient => ingredient.defaultSelected),
     };
   });
   
   const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
-  const [ingredients, setIngredients] = useState(ingredientsJSON);
+  const [ingredients, setIngredients] = useState([]);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [recipeId, setRecipeId] = useState(recipe ? recipe._id : null);
   const [deleteDialogOpened, setDeleteDialogOpened] = useState(false);
@@ -72,27 +136,24 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     sessionStorage.setItem('recipe', JSON.stringify(recipeState));
   }, [recipeState]);
 
-  /**
-   * Fetches ingredient data from a JSON file and initializes the recipe state with the default ingredient percentages and selected ingredients.
-   * This effect is called once when the component is mounted, and it ensures the recipe state is properly initialized with the ingredient data.
-   */
-  // useEffect(() => {
-  //   fetch(ingredientsJSON)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       setIngredients(data);
-  //       const defaultSelectedIngredients = data.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true);
-  //       setRecipeState(prevState => ({
-  //         ...prevState,
-  //         ingredientPercentages: prevState.ingredientPercentages &&
-  //           prevState.ingredientPercentages.length > 0 ?
-  //           prevState.ingredientPercentages :
-  //           data.map(ingredient => ingredient.defaultPercentage),
 
-  //         selectedIngredients: defaultSelectedIngredients,
-  //       }));
-  //     });
-  // }, []);
+  /**
+   * Initializes the recipe state with the default ingredient data.
+   * This effect is called once when the component is mounted, and it sets the initial state of the recipe, including the default ingredient percentages and selected ingredients.
+   */
+  useEffect(() => {
+    const defaultSelectedIngredients = defaultIngredients.map(ingredient => ingredient.defaultSelected);
+    setIngredients(defaultIngredients);
+    setRecipeState(prevState => ({
+      ...prevState,
+      ingredientPercentages: prevState.ingredientPercentages &&
+        prevState.ingredientPercentages.length > 0 ?
+        prevState.ingredientPercentages :
+        data.map(ingredient => ingredient.defaultPercentage),
+
+      selectedIngredients: defaultSelectedIngredients,
+    }));
+  }, []);
 
   /**
    * Calculates the base ingredient weight based on the total dough mass and the selected ingredient percentages.
