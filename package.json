@@ -12,5 +12,8 @@
     "engines": {
       "node": "14.x"
     },
-    "private": true
+    "private": true,
+    "devDependencies": {
+        "vite": "^5.2.0"
+  }
   }
