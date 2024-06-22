@@ -150,7 +150,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       ingredientPercentages: prevState.ingredientPercentages &&
         prevState.ingredientPercentages.length > 0 ?
         prevState.ingredientPercentages :
-        defaultPercentages.map(ingredient => ingredient.defaultPercentage),
+        defaultPercentages,
 
       selectedIngredients: defaultSelectedIngredients,
     }));
