@@ -143,13 +143,14 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
    */
   useEffect(() => {
     const defaultSelectedIngredients = defaultIngredients.map(ingredient => ingredient.defaultSelected);
+    const defaultPercentages = defaultIngredients.map(ingredient => ingredient.defaultPercentage);
     setIngredients(defaultIngredients);
     setRecipeState(prevState => ({
       ...prevState,
       ingredientPercentages: prevState.ingredientPercentages &&
         prevState.ingredientPercentages.length > 0 ?
         prevState.ingredientPercentages :
-        data.map(ingredient => ingredient.defaultPercentage),
+        defaultPercentages.map(ingredient => ingredient.defaultPercentage),
 
       selectedIngredients: defaultSelectedIngredients,
     }));
