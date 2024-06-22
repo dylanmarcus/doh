@@ -276,18 +276,13 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
   };
 
   const resetRecipe = () => {
-    fetch('src/utils/ingredients.json')
-      .then(response => response.json())
-      .then(data => {
-        const defaultSelectedIngredients = data.map(ingredient => ingredient.defaultSelected !== undefined ? ingredient.defaultSelected : true);
-        setRecipeState({
-          name: '',
-          numberOfBalls: 1,
-          ballWeight: 500,
-          ingredientPercentages: data.map(ingredient => ingredient.defaultPercentage),
-          selectedIngredients: defaultSelectedIngredients,
-        });
-      });
+    setRecipeState({
+      name: '',
+      numberOfBalls: 1,
+      ballWeight: 500,
+      ingredientPercentages: defaultIngredients.map(ingredient => ingredient.defaultPercentage),
+      selectedIngredients: defaultIngredients.map(ingredient => ingredient.defaultSelected),
+    });
     sessionStorage.removeItem('recipe');
   };
 
