@@ -2,18 +2,21 @@
     "name": "doh-app",
     "version": "1.0.0",
     "scripts": {
-      "install:frontend": "cd frontend && npm install",
-      "install:backend": "cd backend && npm install",
-      "build:frontend": "cd frontend && npm run build",
-      "postinstall": "npm run install:frontend && npm run install:backend",
-      "start": "node backend/index.js",
-      "heroku-postbuild": "npm run build:frontend"
+        "install:frontend": "cd frontend && npm install",
+        "install:backend": "cd backend && npm install",
+        "build:frontend": "cd frontend && npm run build",
+        "postinstall": "npm run install:frontend && npm run install:backend",
+        "start": "node backend/index.js",
+        "heroku-postbuild": "npm run build:frontend"
     },
     "engines": {
-      "node": "^22.x"
+        "node": "^22.x"
     },
     "private": true,
     "devDependencies": {
         "vite": "^5.2.0"
-  }
-  }
+    },
+    "dependencies": {
+        "@vitejs/plugin-react": "^4.3.1"
+    }
+}
