@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000/api',
+        target: import.meta.env.PROD ? 'https://doh-app-446575e57f3f.herokuapp.com/api' : 'http://localhost:5000/api',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '')
