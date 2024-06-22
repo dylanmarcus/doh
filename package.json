@@ -10,7 +10,7 @@
       "heroku-postbuild": "npm run build:frontend"
     },
     "engines": {
-      "node": "14.x"
+      "node": "^22.x"
     },
     "private": true,
     "devDependencies": {
