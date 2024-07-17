@@ -49,7 +49,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
   });
 
   const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
-  const [ingredients, setIngredients] = useState([...defaultIngredients, ...recipeState.customIngredients]);
+  const [ingredients, setIngredients] = useState([...defaultIngredients, ...(recipeState.customIngredients || [])]);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [recipeId, setRecipeId] = useState(recipe ? recipe._id : null);
   const [deleteDialogOpened, setDeleteDialogOpened] = useState(false);
@@ -76,7 +76,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
   }, []);
 
   useEffect(() => {
-    setIngredients([...defaultIngredients, ...recipeState.customIngredients]);
+    setIngredients([...defaultIngredients, ...(recipeState.customIngredients || [])]);
   }, [recipeState.customIngredients]);
 
   useEffect(() => {
@@ -106,7 +106,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
   }, [recipe]);
 
   useEffect(() => {
-    setIngredients([...defaultIngredients, ...recipeState.customIngredients]);
+    setIngredients([...defaultIngredients, ...(recipeState.customIngredients || [])]);
   }, [recipeState]);
 
   useEffect(() => {
@@ -197,7 +197,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       ballWeight: 500,
       ingredientPercentages: defaultIngredients.map(ingredient => ingredient.defaultPercentage),
       selectedIngredients: defaultIngredients.map(ingredient => ingredient.defaultSelected),
-      customIngredients: [],
+      customIngredients: [], // Ensure this is always an array
     });
     sessionStorage.removeItem('recipe');
   };
