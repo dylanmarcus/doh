@@ -44,17 +44,16 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       ballWeight: recipe ? recipe.ballWeight : 500,
       ingredientPercentages: defaultIngredients.map(ingredient => ingredient.defaultPercentage),
       selectedIngredients: defaultIngredients.map(ingredient => ingredient.defaultSelected),
+      customIngredients: [], // Ensure this is always an array
     };
   });
-  
+
   const [baseIngredientWeight, setBaseIngredientWeight] = useState(0);
-  const [ingredients, setIngredients] = useState([]);
+  const [ingredients, setIngredients] = useState([...defaultIngredients, ...recipeState.customIngredients]);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [recipeId, setRecipeId] = useState(recipe ? recipe._id : null);
   const [deleteDialogOpened, setDeleteDialogOpened] = useState(false);
 
-
-  // Resets the recipe state if there is no recipe and the user has initiated a reset.
   useEffect(() => {
     if (!recipe && userInitiatedReset) {
       resetRecipe();
@@ -62,38 +61,24 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     }
   }, [recipe, userInitiatedReset]);
 
-  /**
-   * Saves the current recipe state to the browser's session storage.
-   * This ensures the recipe state is persisted across page refreshes or navigation.
-   */
   useEffect(() => {
     sessionStorage.setItem('recipe', JSON.stringify(recipeState));
   }, [recipeState]);
 
-
-  /**
-   * Initializes the recipe state with the default ingredient data.
-   * This effect is called once when the component is mounted, and it sets the initial state of the recipe, including the default ingredient percentages and selected ingredients.
-   */
   useEffect(() => {
     const defaultSelectedIngredients = defaultIngredients.map(ingredient => ingredient.defaultSelected);
     const defaultPercentages = defaultIngredients.map(ingredient => ingredient.defaultPercentage);
-    setIngredients(defaultIngredients);
     setRecipeState(prevState => ({
       ...prevState,
-      ingredientPercentages: prevState.ingredientPercentages &&
-        prevState.ingredientPercentages.length > 0 ?
-        prevState.ingredientPercentages :
-        defaultPercentages,
-
-      selectedIngredients: defaultSelectedIngredients,
+      ingredientPercentages: prevState.ingredientPercentages.length > 0 ? prevState.ingredientPercentages : defaultPercentages,
+      selectedIngredients: prevState.selectedIngredients.length > 0 ? prevState.selectedIngredients : defaultSelectedIngredients,
     }));
   }, []);
 
-  /**
-   * Calculates the base ingredient weight based on the total dough mass and the selected ingredient percentages.
-   * This function is called whenever the recipe state changes.
-   */
+  useEffect(() => {
+    setIngredients([...defaultIngredients, ...recipeState.customIngredients]);
+  }, [recipeState.customIngredients]);
+
   useEffect(() => {
     const updateBaseIngredientWeight = () => {
       const totalDoughMass = recipeState.numberOfBalls * recipeState.ballWeight;
@@ -107,11 +92,6 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     updateBaseIngredientWeight();
   }, [recipeState.numberOfBalls, recipeState.ballWeight, recipeState.ingredientPercentages, recipeState.selectedIngredients, ingredients]);
 
-  /**
-   * Initializes the recipe state with the data from the provided `recipe` object.
-   * This effect is called whenever the `recipe` prop changes, and it ensures the
-   * recipe state is properly updated with the new recipe data.
-   */
   useEffect(() => {
     if (recipe) {
       setRecipeState({
@@ -120,19 +100,19 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
         ballWeight: recipe.ballWeight,
         ingredientPercentages: recipe.ingredients.map(ingredient => ingredient.percentage),
         selectedIngredients: recipe.ingredients.map(ingredient => ingredient.selected),
+        customIngredients: recipe.customIngredients || [], // Ensure this is always an array
       });
     }
   }, [recipe]);
 
-  /**
-   * Initializes the `recipeId` state with the `_id` of the provided `recipe` object, or sets it to `null` if no `recipe` is provided.
-   * This effect is called whenever the `recipe` prop changes, and it ensures the `recipeId` state is properly updated with the new recipe data.
-   */
+  useEffect(() => {
+    setIngredients([...defaultIngredients, ...recipeState.customIngredients]);
+  }, [recipeState]);
+
   useEffect(() => {
     setRecipeId(recipe ? recipe._id : null);
   }, [recipe]);
 
-   // Handles changes to the recipe state by updating the specified field with the provided value.
   const handleInputChange = (field, value) => {
     setRecipeState(prev => ({ ...prev, [field]: value }));
   };
@@ -169,12 +149,13 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     const recipeData = {
       name: recipeState.name,
       ingredients: recipeState.selectedIngredients.map((selected, index) => ({
-        label: ingredients[index].label,
+        label: ingredients[index]?.label || recipeState.customIngredients[index - ingredients.length]?.label,
         percentage: recipeState.ingredientPercentages[index],
         selected
       })),
       numberOfBalls: recipeState.numberOfBalls,
       ballWeight: recipeState.ballWeight,
+      customIngredients: recipeState.customIngredients,
     };
 
     const url = recipeId ? `/api/recipes/${recipeId}` : '/api/recipes/';
@@ -216,6 +197,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       ballWeight: 500,
       ingredientPercentages: defaultIngredients.map(ingredient => ingredient.defaultPercentage),
       selectedIngredients: defaultIngredients.map(ingredient => ingredient.defaultSelected),
+      customIngredients: [],
     });
     sessionStorage.removeItem('recipe');
   };
@@ -314,6 +296,12 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
             selectedIngredients: newSelectedIngredients
           }))}
           onClose={() => setSelectorOpen(false)}
+          customIngredients={recipeState.customIngredients}
+          setCustomIngredients={(newCustomIngredients) => setRecipeState(prevState => ({
+            ...prevState,
+            customIngredients: newCustomIngredients,
+            ingredientPercentages: [...prevState.ingredientPercentages, 0], // Add default percentage for new custom ingredient
+          }))}
         />
       </Modal>
       <Grid className={classes.ingredientRow}>

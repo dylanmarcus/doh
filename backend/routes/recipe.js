@@ -36,11 +36,19 @@ router.get('/:id', protect, async (req, res) => {
 // POST /api/recipes
 // Create a new recipe for the authenticated user
 router.post('/', protect, async (req, res) => {
-  const { name, ingredients, numberOfBalls, ballWeight } = req.body;
   try {
-    const recipe = new Recipe({ userId: req.user._id, name, ingredients, numberOfBalls, ballWeight });
-    await recipe.save();
-    res.status(201).json(recipe);
+    const { name, ingredients, numberOfBalls, ballWeight, customIngredients } = req.body;
+    const newRecipe = new Recipe({
+      userId: req.user._id,
+      name,
+      ingredients,
+      numberOfBalls,
+      ballWeight,
+      customIngredients
+    });
+
+    const savedRecipe = await newRecipe.save();
+    res.status(201).json(savedRecipe);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -59,11 +67,12 @@ router.put('/:id', protect, async (req, res) => {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
-    const { name, ingredients, numberOfBalls, ballWeight } = req.body;
+    const { name, ingredients, numberOfBalls, ballWeight, customIngredients } = req.body;
     recipe.name = name;
     recipe.ingredients = ingredients;
     recipe.numberOfBalls = numberOfBalls;
     recipe.ballWeight = ballWeight;
+    recipe.customIngredients = customIngredients;
 
     await recipe.save();
     res.json(recipe);

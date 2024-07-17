@@ -11,7 +11,14 @@ const RecipeSchema = new mongoose.Schema({
     }
   ],
   numberOfBalls: { type: Number, required: true },
-  ballWeight: { type: Number, required: true }
+  ballWeight: { type: Number, required: true },
+  customIngredients: [
+    {
+      name: String,
+      label: String,
+      isBaseIngredient: Boolean,
+    }
+  ],
 });
 
 module.exports = mongoose.model('Recipe', RecipeSchema);
