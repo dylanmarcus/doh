@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AppShell, Burger, Grid, Group, Container, Title, Button, ActionIcon, Tooltip, rem } from '@mantine/core';
+import { AppShell, Burger, Grid, Group, Container, Flex, Box, Title, Button, ActionIcon, Tooltip, rem } from '@mantine/core';
 import { FaPlus } from 'react-icons/fa';
 import { useDisclosure } from '@mantine/hooks';
+import { useMediaQuery } from '@mantine/hooks';
+import UserMenu from './components/UserMenu';
 import axios from 'axios';
 import logo from '../src/assets/donut.png';
 import Recipe from './components/Recipe';
@@ -12,6 +14,7 @@ import classes from '../styles/RecipeList.module.css';
 const App = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginOpened, setLoginOpened] = useState(false);
   const [signUpOpened, setSignUpOpened] = useState(false);
@@ -93,35 +96,49 @@ const App = () => {
       padding='md'
     >
       <AppShell.Header>
-        <Group style={{ width: '100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, marginTop: 10, marginLeft: 10, paddingRight: 20 }}>
-          <Tooltip
-            label="Saved recipes"
-            placement="bottom"
-            withArrow
-            disabled={mobileOpened || desktopOpened}
-          >
-            <span>
-              <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom='sm' size='sm' />
-              <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom='sm' size='sm' />
-            </span>
-          </Tooltip>
-          <img src={logo} alt="Logo" style={{ height: rem(50) }} />
-          <Title order={1} style={{ flexGrow: 1 }}>Doh</Title>
-          <Group>
-            {!isAuthenticated && (
-              <>
-                <Button onClick={() => setLoginOpened(true)}>Login</Button>
-                <Button onClick={() => setSignUpOpened(true)}>Sign Up</Button>
-              </>
-            )}
-            {isAuthenticated && (
-              <Button color='red' onClick={handleLogout}>Logout</Button>
-            )}
-          </Group>
-          <Login opened={loginOpened} onClose={() => setLoginOpened(false)} onLoginSuccess={handleLogin} />
-          <SignUp opened={signUpOpened} onClose={() => setSignUpOpened(false)} onSignUpSuccess={handleLogin} />
-        </Group>
-      </AppShell.Header>
+      <Flex
+    justify="space-between"
+    align="center"
+    wrap="wrap"
+    style={{
+      width: '100%',
+      padding: '0 20px',
+      marginBottom: 0,
+      marginTop: 5,
+    }}
+  >
+    <Tooltip label="Saved recipes" position="bottom" withArrow>
+      <Box>
+        <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
+        <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
+      </Box>
+    </Tooltip>
+    <img src={logo} alt="Logo" style={{ height: rem(50), marginLeft: rem(10) }} />
+    <Title order={1} style={{ flexGrow: 1, marginLeft: rem(10) }}>Doh</Title>
+    {isMobile ? (
+      <UserMenu
+        isAuthenticated={isAuthenticated}
+        onLogin={() => setLoginOpened(true)}
+        onSignUp={() => setSignUpOpened(true)}
+        onLogout={handleLogout}
+      />
+    ) : (
+      <Group style={{ flexShrink: 0 }}>
+        {!isAuthenticated && (
+          <>
+            <Button onClick={() => setLoginOpened(true)}>Login</Button>
+            <Button onClick={() => setSignUpOpened(true)}>Sign Up</Button>
+          </>
+        )}
+        {isAuthenticated && (
+          <Button color="red" onClick={handleLogout}>Logout</Button>
+        )}
+      </Group>
+    )}
+  </Flex>
+  <Login opened={loginOpened} onClose={() => setLoginOpened(false)} onLoginSuccess={handleLogin} />
+  <SignUp opened={signUpOpened} onClose={() => setSignUpOpened(false)} onSignUpSuccess={handleLogin} />
+</AppShell.Header>
       <AppShell.Navbar ref={navbarRef} p='md' style={{ flexGrow: 1, overflowY: 'auto' }}>
         {recipes.map(recipe => (
           <a
