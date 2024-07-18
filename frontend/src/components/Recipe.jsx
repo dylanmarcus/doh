@@ -54,6 +54,7 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
   const [recipeId, setRecipeId] = useState(recipe ? recipe._id : null);
   const [deleteDialogOpened, setDeleteDialogOpened] = useState(false);
 
+  // Resets the recipe state when the `recipe` prop or `userInitiatedReset` flag changes
   useEffect(() => {
     if (!recipe && userInitiatedReset) {
       resetRecipe();
@@ -61,10 +62,13 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     }
   }, [recipe, userInitiatedReset]);
 
+  // Saves the current recipe state to the browser's session storage
+  // This ensures that the recipe state is persisted across page refreshes or navigation
   useEffect(() => {
     sessionStorage.setItem('recipe', JSON.stringify(recipeState));
   }, [recipeState]);
 
+  // Initializes the recipe state with default values for ingredient percentages and selected ingredients
   useEffect(() => {
     const defaultSelectedIngredients = defaultIngredients.map(ingredient => ingredient.defaultSelected);
     const defaultPercentages = defaultIngredients.map(ingredient => ingredient.defaultPercentage);
@@ -75,10 +79,12 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
     }));
   }, []);
 
+  // Updates the `ingredients` state with the default ingredients and any custom ingredients from the `recipeState`
   useEffect(() => {
     setIngredients([...defaultIngredients, ...(recipeState.customIngredients || [])]);
   }, [recipeState.customIngredients]);
 
+  // Calculates the base ingredient weight based on the recipe state
   useEffect(() => {
     const updateBaseIngredientWeight = () => {
       const totalDoughMass = recipeState.numberOfBalls * recipeState.ballWeight;
@@ -88,10 +94,10 @@ const Recipe = ({ recipe, onRecipeSaved, navbarWidth, navbarOpened, userInitiate
       const percentageSum = selectedPercentages.reduce((sum, percentage) => sum + percentage, 0);
       setBaseIngredientWeight(totalDoughMass / (1 + percentageSum / 100));
     };
-
     updateBaseIngredientWeight();
   }, [recipeState.numberOfBalls, recipeState.ballWeight, recipeState.ingredientPercentages, recipeState.selectedIngredients, ingredients]);
 
+  // Initializes the recipe state with the data from the `recipe` prop
   useEffect(() => {
     if (recipe) {
       setRecipeState({
