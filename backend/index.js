@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.PRODUCTION_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL,
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
