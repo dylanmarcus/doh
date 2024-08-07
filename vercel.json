@@ -21,4 +21,4 @@
         "dest": "frontend/dist/$1"
       }
     ]
-  }
+}
