@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node backend/index.js && vite frontend",
     "build": "vite build frontend",
-    "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run start --prefix backend\""
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"npm run start --prefix backend\"",
+    "install": "pnpm install --prefix frontend && pnpm install --prefix backend"
   },
   "dependencies": {
     "concurrently": "^7.0.0",
