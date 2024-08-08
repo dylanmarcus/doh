@@ -5,7 +5,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useMediaQuery } from '@mantine/hooks';
 import UserMenu from './components/UserMenu';
 import axios from 'axios';
-import logo from '../src/assets/donut.png';
+import logo from './assets/donut.png';
 import Recipe from './components/Recipe';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
