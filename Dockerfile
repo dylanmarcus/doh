@@ -1,30 +1,26 @@
-FROM node:22-bullseye-slim
+FROM node:18-bullseye-slim
 
 WORKDIR /app
 
+# Copy package.json files
 COPY package*.json ./
 COPY frontend/package*.json ./frontend/
 COPY backend/package*.json ./backend/
 
-RUN npm run postinstall
+# Clean npm cache and remove existing node_modules
+RUN npm cache clean --force
+RUN rm -rf node_modules frontend/node_modules backend/node_modules
 
-# Remove node_modules directories if they exist to avoid conflicts
-RUN rm -rf ./frontend/node_modules
-RUN rm -rf ./backend/node_modules
+# Install dependencies
+RUN npm install --legacy-peer-deps
+RUN cd frontend && npm install --legacy-peer-deps
+RUN cd backend && npm install --legacy-peer-deps
 
+# Copy the rest of the application code
 COPY . .
 
-# Install dependencies without optional packages
-RUN cd frontend && npm install --no-optional
-
-# Manually install an older version of rollup
-RUN cd frontend && npm install rollup@2.79.1 --no-optional
-
-# Manually install vite and its dependencies
-RUN cd frontend && npm install vite@4.5.0 @vitejs/plugin-react --no-optional
-
 # Build the frontend
-RUN cd frontend && npx vite build
+RUN cd frontend && npm run build
 
 EXPOSE 5000
 
